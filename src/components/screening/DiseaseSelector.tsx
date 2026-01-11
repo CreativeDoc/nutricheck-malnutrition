@@ -1,8 +1,6 @@
 import { CurrentDiseases } from '@/types/screening';
-import { cn } from '@/lib/utils';
-import { Checkbox } from '@/components/ui/checkbox';
+import { QuestionCard } from './QuestionCard';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 
 interface DiseaseSelectorProps {
   value: CurrentDiseases;
@@ -15,116 +13,148 @@ export function DiseaseSelector({ value, onChange }: DiseaseSelectorProps) {
   };
 
   return (
-    <div className="space-y-4">
-      <p className="text-senior-lg text-muted-foreground text-center mb-4">
-        Wählen Sie alle zutreffenden Erkrankungen aus
+    <div className="space-y-6">
+      <p className="text-senior-lg text-muted-foreground text-center mb-6">
+        Bitte beantworten Sie für jede Erkrankung, ob diese bei Ihnen vorliegt.
       </p>
       
+      {/* Cancer */}
       <div className="space-y-3">
-        {/* Cancer */}
-        <div className="touch-card p-4 space-y-3">
-          <div className="flex items-center gap-4">
-            <Checkbox
-              id="cancer"
-              checked={value.cancer}
-              onCheckedChange={(checked) => updateDisease('cancer', !!checked)}
-              className="w-8 h-8"
-            />
-            <Label htmlFor="cancer" className="text-senior-lg cursor-pointer flex-1">
-              Krebs
-            </Label>
-          </div>
-          {value.cancer && (
-            <Input
-              placeholder="Welche Art von Krebs?"
-              value={value.cancerType || ''}
-              onChange={(e) => updateDisease('cancerType', e.target.value)}
-              className="text-senior-base h-14"
-            />
-          )}
+        <p className="text-senior-lg font-medium text-center">Haben Sie Krebs?</p>
+        <div className="grid grid-cols-2 gap-4">
+          <QuestionCard
+            selected={value.cancer === true}
+            onClick={() => updateDisease('cancer', true)}
+            size="medium"
+          >
+            Ja
+          </QuestionCard>
+          <QuestionCard
+            selected={value.cancer === false}
+            onClick={() => updateDisease('cancer', false)}
+            size="medium"
+          >
+            Nein
+          </QuestionCard>
         </div>
-
-        {/* Pneumonia */}
-        <div className="touch-card p-4">
-          <div className="flex items-center gap-4">
-            <Checkbox
-              id="pneumonia"
-              checked={value.pneumonia}
-              onCheckedChange={(checked) => updateDisease('pneumonia', !!checked)}
-              className="w-8 h-8"
-            />
-            <Label htmlFor="pneumonia" className="text-senior-lg cursor-pointer flex-1">
-              Lungenentzündung
-            </Label>
-          </div>
-        </div>
-
-        {/* Heart Failure */}
-        <div className="touch-card p-4">
-          <div className="flex items-center gap-4">
-            <Checkbox
-              id="heartFailure"
-              checked={value.heartFailure}
-              onCheckedChange={(checked) => updateDisease('heartFailure', !!checked)}
-              className="w-8 h-8"
-            />
-            <Label htmlFor="heartFailure" className="text-senior-lg cursor-pointer flex-1">
-              Schwere Herzinsuffizienz
-            </Label>
-          </div>
-        </div>
-
-        {/* Stroke */}
-        <div className="touch-card p-4">
-          <div className="flex items-center gap-4">
-            <Checkbox
-              id="stroke"
-              checked={value.stroke}
-              onCheckedChange={(checked) => updateDisease('stroke', !!checked)}
-              className="w-8 h-8"
-            />
-            <Label htmlFor="stroke" className="text-senior-lg cursor-pointer flex-1">
-              Schlaganfall
-            </Label>
-          </div>
-        </div>
-
-        {/* Digestive Issues */}
-        <div className="touch-card p-4 space-y-3">
-          <div className="flex items-center gap-4">
-            <Checkbox
-              id="digestiveIssues"
-              checked={value.digestiveIssues}
-              onCheckedChange={(checked) => updateDisease('digestiveIssues', !!checked)}
-              className="w-8 h-8"
-            />
-            <Label htmlFor="digestiveIssues" className="text-senior-lg cursor-pointer flex-1">
-              Eingeschränkte Verdauungsleistung
-            </Label>
-          </div>
-          <p className="text-muted-foreground text-senior-base ml-12">
-            z.B. chron. entzündliche Darmerkrankungen, Durchfälle, Verstopfung, Kurzdarmsyndrom
-          </p>
-          {value.digestiveIssues && (
-            <Input
-              placeholder="Welche Beschwerden genau?"
-              value={value.digestiveDetails || ''}
-              onChange={(e) => updateDisease('digestiveDetails', e.target.value)}
-              className="text-senior-base h-14"
-            />
-          )}
-        </div>
-
-        {/* Other Diseases */}
-        <div className="touch-card p-4 space-y-3">
-          <Label className="text-senior-lg">Andere Erkrankungen</Label>
+        {value.cancer && (
           <Input
-            placeholder="Falls ja, welche?"
-            value={value.otherDiseases || ''}
-            onChange={(e) => updateDisease('otherDiseases', e.target.value)}
-            className="text-senior-base h-14"
+            placeholder="Welche Art von Krebs?"
+            value={value.cancerType || ''}
+            onChange={(e) => updateDisease('cancerType', e.target.value)}
+            className="text-senior-base h-14 mt-2"
           />
+        )}
+      </div>
+
+      {/* Pneumonia */}
+      <div className="space-y-3">
+        <p className="text-senior-lg font-medium text-center">Haben Sie eine Lungenentzündung?</p>
+        <div className="grid grid-cols-2 gap-4">
+          <QuestionCard
+            selected={value.pneumonia === true}
+            onClick={() => updateDisease('pneumonia', true)}
+            size="medium"
+          >
+            Ja
+          </QuestionCard>
+          <QuestionCard
+            selected={value.pneumonia === false}
+            onClick={() => updateDisease('pneumonia', false)}
+            size="medium"
+          >
+            Nein
+          </QuestionCard>
         </div>
+      </div>
+
+      {/* Heart Failure */}
+      <div className="space-y-3">
+        <p className="text-senior-lg font-medium text-center">Haben Sie eine schwere Herzinsuffizienz?</p>
+        <div className="grid grid-cols-2 gap-4">
+          <QuestionCard
+            selected={value.heartFailure === true}
+            onClick={() => updateDisease('heartFailure', true)}
+            size="medium"
+          >
+            Ja
+          </QuestionCard>
+          <QuestionCard
+            selected={value.heartFailure === false}
+            onClick={() => updateDisease('heartFailure', false)}
+            size="medium"
+          >
+            Nein
+          </QuestionCard>
+        </div>
+      </div>
+
+      {/* Stroke */}
+      <div className="space-y-3">
+        <p className="text-senior-lg font-medium text-center">Hatten Sie einen Schlaganfall?</p>
+        <div className="grid grid-cols-2 gap-4">
+          <QuestionCard
+            selected={value.stroke === true}
+            onClick={() => updateDisease('stroke', true)}
+            size="medium"
+          >
+            Ja
+          </QuestionCard>
+          <QuestionCard
+            selected={value.stroke === false}
+            onClick={() => updateDisease('stroke', false)}
+            size="medium"
+          >
+            Nein
+          </QuestionCard>
+        </div>
+      </div>
+
+      {/* Digestive Issues */}
+      <div className="space-y-3">
+        <p className="text-senior-lg font-medium text-center">
+          Haben Sie eine eingeschränkte Verdauungsleistung?
+        </p>
+        <p className="text-senior-base text-muted-foreground text-center">
+          z.B. chron. entzündliche Darmerkrankungen, Durchfälle, Verstopfung, Kurzdarmsyndrom
+        </p>
+        <div className="grid grid-cols-2 gap-4">
+          <QuestionCard
+            selected={value.digestiveIssues === true}
+            onClick={() => updateDisease('digestiveIssues', true)}
+            size="medium"
+          >
+            Ja
+          </QuestionCard>
+          <QuestionCard
+            selected={value.digestiveIssues === false}
+            onClick={() => updateDisease('digestiveIssues', false)}
+            size="medium"
+          >
+            Nein
+          </QuestionCard>
+        </div>
+        {value.digestiveIssues && (
+          <Input
+            placeholder="Welche Beschwerden genau?"
+            value={value.digestiveDetails || ''}
+            onChange={(e) => updateDisease('digestiveDetails', e.target.value)}
+            className="text-senior-base h-14 mt-2"
+          />
+        )}
+      </div>
+
+      {/* Other Diseases */}
+      <div className="space-y-3">
+        <p className="text-senior-lg font-medium text-center">
+          Haben Sie andere Erkrankungen?
+        </p>
+        <Input
+          placeholder="Falls ja, welche?"
+          value={value.otherDiseases || ''}
+          onChange={(e) => updateDisease('otherDiseases', e.target.value)}
+          className="text-senior-base h-14"
+        />
       </div>
     </div>
   );
