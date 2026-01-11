@@ -24,7 +24,7 @@ export function calculateNRSScore(answers: ScreeningAnswers, patientCode: string
     bmiScore: 0,
     weightLossScore: 0,
     nutritionScore: 0,
-    illnessScore: 0,
+    diseaseScore: 0,
     ageBonus: 0,
   };
 
@@ -74,8 +74,8 @@ export function calculateNRSScore(answers: ScreeningAnswers, patientCode: string
     }
   }
 
-  // Nutrition Score (based on portion size)
-  if (answers.hasReducedEating === true && answers.portionSize) {
+  // Nutrition Score (based on portion size and meals per day)
+  if (answers.portionSize) {
     switch (answers.portionSize) {
       case 75:
         scores.nutritionScore = 1;
@@ -88,10 +88,24 @@ export function calculateNRSScore(answers: ScreeningAnswers, patientCode: string
         break;
     }
   }
+  
+  // Additional nutrition factors from meals per day
+  if (answers.mealsPerDay !== null && answers.mealsPerDay < 3) {
+    scores.nutritionScore = Math.max(scores.nutritionScore, 1);
+  }
 
-  // Illness Score
-  if (answers.hasAcuteIllness === true) {
-    scores.illnessScore = 1;
+  // Disease Score - patients have consuming diseases by default
+  // Add points based on severity indicators
+  const diseases = answers.currentDiseases;
+  if (diseases.cancer || diseases.heartFailure || diseases.stroke) {
+    scores.diseaseScore = 2;
+  } else if (diseases.pneumonia || diseases.digestiveIssues) {
+    scores.diseaseScore = 1;
+  }
+  
+  // Weakness indicators add to disease score
+  if (answers.feelsWeaker || answers.muscleLoss || answers.frequentInfections) {
+    scores.diseaseScore = Math.max(scores.diseaseScore, 1);
   }
 
   // Age Bonus
@@ -105,7 +119,7 @@ export function calculateNRSScore(answers: ScreeningAnswers, patientCode: string
     scores.bmiScore + 
     scores.weightLossScore + 
     scores.nutritionScore + 
-    scores.illnessScore + 
+    scores.diseaseScore + 
     scores.ageBonus;
 
   const isAtRisk = totalScore >= 3;
@@ -150,7 +164,7 @@ export function generateReportText(result: ScreeningResult): string {
   lines.push(`• BMI-Score: ${result.scores.bmiScore} (BMI: ${result.scores.bmi.toFixed(1)})`);
   lines.push(`• Gewichtsverlust: ${result.scores.weightLossScore}`);
   lines.push(`• Nahrungszufuhr: ${result.scores.nutritionScore}`);
-  lines.push(`• Akute Krankheit: ${result.scores.illnessScore}`);
+  lines.push(`• Erkrankungen: ${result.scores.diseaseScore}`);
   lines.push(`• Alters-Bonus (≥70): ${result.scores.ageBonus}`);
 
   return lines.join('\n');

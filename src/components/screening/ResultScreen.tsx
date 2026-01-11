@@ -145,7 +145,7 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard }: Resu
               { label: 'BMI-Score', value: result.scores.bmiScore, detail: `BMI: ${result.scores.bmi.toFixed(1)}` },
               { label: 'Gewichtsverlust', value: result.scores.weightLossScore },
               { label: 'Nahrungszufuhr', value: result.scores.nutritionScore },
-              { label: 'Akute Krankheit', value: result.scores.illnessScore },
+              { label: 'Erkrankungen', value: result.scores.diseaseScore },
               { label: 'Alters-Bonus (≥70)', value: result.scores.ageBonus },
             ].map((item) => (
               <div key={item.label} className="flex justify-between items-center">
