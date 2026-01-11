@@ -1,12 +1,20 @@
 import { Button } from '@/components/ui/button';
-import { LogOut, Activity } from 'lucide-react';
+import { LogOut, Activity, Settings } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface HeaderProps {
   practiceName?: string;
   onLogout: () => void;
+  showSettings?: boolean;
+  onSettingsClick?: () => void;
 }
 
-export function Header({ practiceName = "Ihre Praxis", onLogout }: HeaderProps) {
+export function Header({ 
+  practiceName = "Ihre Praxis", 
+  onLogout,
+  showSettings = false,
+  onSettingsClick
+}: HeaderProps) {
   return (
     <header className="bg-card border-b border-border px-6 py-4">
       <div className="max-w-6xl mx-auto flex items-center justify-between">
@@ -22,14 +30,25 @@ export function Header({ practiceName = "Ihre Praxis", onLogout }: HeaderProps) 
           </div>
         </div>
 
-        <Button
-          variant="outline"
-          onClick={onLogout}
-          className="gap-2"
-        >
-          <LogOut className="w-5 h-5" />
-          Abmelden
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant={showSettings ? "default" : "outline"}
+            onClick={onSettingsClick}
+            className={cn("gap-2", showSettings && "bg-primary text-primary-foreground")}
+          >
+            <Settings className="w-5 h-5" />
+            <span className="hidden sm:inline">Einstellungen</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            onClick={onLogout}
+            className="gap-2"
+          >
+            <LogOut className="w-5 h-5" />
+            <span className="hidden sm:inline">Abmelden</span>
+          </Button>
+        </div>
       </div>
     </header>
   );
