@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ScreeningAnswers, WizardStep, initialAnswers } from '@/types/screening';
 import { calculateNRSScore, calculateAge } from '@/lib/nrsCalculator';
 import { QuestionLayout } from './QuestionLayout';
@@ -6,8 +6,16 @@ import { QuestionCard } from './QuestionCard';
 import { NumberPicker } from './NumberPicker';
 import { PortionSelector } from './PortionSelector';
 import { MobilitySelector } from './MobilitySelector';
+import { GenderSelector } from './GenderSelector';
+import { FrequencySelector } from './FrequencySelector';
+import { MealsPerDaySelector } from './MealsPerDaySelector';
+import { DrinkingAmountSelector } from './DrinkingAmountSelector';
+import { DiseaseSelector } from './DiseaseSelector';
+import { PhysicalConditionQuestions } from './PhysicalConditionQuestions';
 import { ResultScreen } from './ResultScreen';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { HelpCircle } from 'lucide-react';
 
 interface ScreeningWizardProps {
@@ -27,7 +35,7 @@ export function ScreeningWizard({
     ...initialAnswers,
     birthDate,
   });
-  const [currentStep, setCurrentStep] = useState<WizardStep>('height');
+  const [currentStep, setCurrentStep] = useState<WizardStep>('gender');
   const [result, setResult] = useState<ReturnType<typeof calculateNRSScore> | null>(null);
 
   const age = calculateAge(birthDate);
@@ -39,16 +47,19 @@ export function ScreeningWizard({
     setAnswers(prev => ({ ...prev, [key]: value }));
   };
 
-  const getStepNumber = (): number => {
-    const steps: WizardStep[] = [
-      'height', 'weight', 'weightLoss', 
-      answers.weightUnknown ? 'clothingLoose' : 'weightLossAmount',
-      'eating', 'portionSize', 'mobility', 'swallowing', 'acuteIllness'
-    ];
-    return steps.indexOf(currentStep) + 1;
-  };
+  const totalSteps = 20;
 
-  const totalSteps = 8;
+  const getStepNumber = (): number => {
+    const stepOrder: WizardStep[] = [
+      'gender', 'height', 'weight', 'weightLoss',
+      'mealsPerDay', 'portionSize', 'appetiteByOthers',
+      'fruitPerWeek', 'vegetablesPerWeek', 'sweetPreference', 'meatPerWeek', 'carbsPerWeek',
+      'currentDiseases', 'physicalCondition', 'mobility', 'drinkingAmount', 'swallowing',
+      'medication', 'supplements', 'nutritionTherapy', 'infusions'
+    ];
+    const index = stepOrder.indexOf(currentStep);
+    return index >= 0 ? index + 1 : 1;
+  };
 
   const goNext = (nextStep: WizardStep) => {
     setCurrentStep(nextStep);
@@ -64,6 +75,15 @@ export function ScreeningWizard({
     onComplete(calculatedResult);
   };
 
+  // Check if all physical condition questions are answered
+  const physicalConditionComplete = 
+    answers.feelsWeaker !== null &&
+    answers.muscleLoss !== null &&
+    answers.frequentInfections !== null &&
+    answers.getsOutdoors !== null &&
+    answers.difficultyGettingUp !== null &&
+    answers.shortnessOfBreath !== null;
+
   if (result) {
     return (
       <ResultScreen
@@ -75,16 +95,34 @@ export function ScreeningWizard({
   }
 
   switch (currentStep) {
-    case 'height':
+    case 'gender':
       return (
         <QuestionLayout
           step={1}
+          totalSteps={totalSteps}
+          title="Welches Geschlecht haben Sie?"
+          canGoBack={true}
+          canGoNext={answers.gender !== null}
+          onBack={onCancel}
+          onNext={() => goNext('height')}
+        >
+          <GenderSelector
+            value={answers.gender}
+            onChange={(v) => updateAnswer('gender', v)}
+          />
+        </QuestionLayout>
+      );
+
+    case 'height':
+      return (
+        <QuestionLayout
+          step={2}
           totalSteps={totalSteps}
           title="Wie groß sind Sie?"
           subtitle="Nutzen Sie die + und - Tasten"
           canGoBack={true}
           canGoNext={true}
-          onBack={onCancel}
+          onBack={() => goBack('gender')}
           onNext={() => goNext('weight')}
         >
           <NumberPicker
@@ -102,7 +140,7 @@ export function ScreeningWizard({
     case 'weight':
       return (
         <QuestionLayout
-          step={2}
+          step={3}
           totalSteps={totalSteps}
           title="Wie viel wiegen Sie?"
           subtitle="Schätzen Sie, wenn Sie unsicher sind"
@@ -142,7 +180,7 @@ export function ScreeningWizard({
     case 'weightLoss':
       return (
         <QuestionLayout
-          step={3}
+          step={4}
           totalSteps={totalSteps}
           title="Haben Sie in den letzten 3 Monaten ungewollt abgenommen?"
           canGoBack={true}
@@ -154,7 +192,7 @@ export function ScreeningWizard({
             } else if (answers.weightUnknown) {
               goNext('clothingLoose');
             } else {
-              goNext('eating');
+              goNext('mealsPerDay');
             }
           }}
         >
@@ -180,14 +218,14 @@ export function ScreeningWizard({
     case 'weightLossAmount':
       return (
         <QuestionLayout
-          step={4}
+          step={5}
           totalSteps={totalSteps}
           title="Wie viel haben Sie abgenommen?"
           subtitle="In den letzten 3 Monaten"
           canGoBack={true}
           canGoNext={answers.weightLossAmount !== null}
           onBack={() => goBack('weightLoss')}
-          onNext={() => goNext('eating')}
+          onNext={() => goNext('mealsPerDay')}
         >
           <div className="flex flex-col gap-4">
             {(['1-3kg', '3-6kg', '>6kg'] as const).map((amount) => (
@@ -208,14 +246,14 @@ export function ScreeningWizard({
     case 'clothingLoose':
       return (
         <QuestionLayout
-          step={4}
+          step={5}
           totalSteps={totalSteps}
           title="Ist Ihre Kleidung oder Ihr Schmuck in letzter Zeit weiter geworden?"
           subtitle="Dies hilft uns, Gewichtsverlust einzuschätzen"
           canGoBack={true}
           canGoNext={answers.clothingLoose !== null}
           onBack={() => goBack('weightLoss')}
-          onNext={() => goNext('eating')}
+          onNext={() => goNext('mealsPerDay')}
         >
           <div className="grid grid-cols-2 gap-4">
             <QuestionCard
@@ -236,14 +274,14 @@ export function ScreeningWizard({
         </QuestionLayout>
       );
 
-    case 'eating':
+    case 'mealsPerDay':
       return (
         <QuestionLayout
-          step={5}
+          step={6}
           totalSteps={totalSteps}
-          title="Haben Sie in der letzten Woche weniger gegessen als üblich?"
+          title="Wie viele Mahlzeiten nehmen Sie am Tag zu sich?"
           canGoBack={true}
-          canGoNext={answers.hasReducedEating !== null}
+          canGoNext={answers.mealsPerDay !== null}
           onBack={() => {
             if (answers.weightUnknown) {
               goBack('clothingLoose');
@@ -253,44 +291,26 @@ export function ScreeningWizard({
               goBack('weightLoss');
             }
           }}
-          onNext={() => {
-            if (answers.hasReducedEating) {
-              goNext('portionSize');
-            } else {
-              goNext('mobility');
-            }
-          }}
+          onNext={() => goNext('portionSize')}
         >
-          <div className="grid grid-cols-2 gap-4">
-            <QuestionCard
-              selected={answers.hasReducedEating === true}
-              onClick={() => updateAnswer('hasReducedEating', true)}
-              variant="danger"
-            >
-              Ja
-            </QuestionCard>
-            <QuestionCard
-              selected={answers.hasReducedEating === false}
-              onClick={() => updateAnswer('hasReducedEating', false)}
-              variant="success"
-            >
-              Nein
-            </QuestionCard>
-          </div>
+          <MealsPerDaySelector
+            value={answers.mealsPerDay}
+            onChange={(v) => updateAnswer('mealsPerDay', v)}
+          />
         </QuestionLayout>
       );
 
     case 'portionSize':
       return (
         <QuestionLayout
-          step={6}
+          step={7}
           totalSteps={totalSteps}
-          title="Wie viel haben Sie im Vergleich zu früher gegessen?"
+          title="Wie groß sind Ihre aktuellen Portionen?"
           subtitle="Wählen Sie den passenden Teller"
           canGoBack={true}
           canGoNext={answers.portionSize !== null}
-          onBack={() => goBack('eating')}
-          onNext={() => goNext('mobility')}
+          onBack={() => goBack('mealsPerDay')}
+          onNext={() => goNext('appetiteByOthers')}
         >
           <PortionSelector
             value={answers.portionSize}
@@ -299,22 +319,187 @@ export function ScreeningWizard({
         </QuestionLayout>
       );
 
+    case 'appetiteByOthers':
+      return (
+        <QuestionLayout
+          step={8}
+          totalSteps={totalSteps}
+          title="Wie beurteilen Angehörige oder Freunde Ihren Appetit?"
+          canGoBack={true}
+          canGoNext={answers.appetiteByOthers !== null}
+          onBack={() => goBack('portionSize')}
+          onNext={() => goNext('fruitPerWeek')}
+        >
+          <div className="grid grid-cols-2 gap-4">
+            <QuestionCard
+              selected={answers.appetiteByOthers === 'normal'}
+              onClick={() => updateAnswer('appetiteByOthers', 'normal')}
+              variant="success"
+            >
+              Normal
+            </QuestionCard>
+            <QuestionCard
+              selected={answers.appetiteByOthers === 'limited'}
+              onClick={() => updateAnswer('appetiteByOthers', 'limited')}
+              variant="danger"
+            >
+              Eingeschränkt
+            </QuestionCard>
+          </div>
+        </QuestionLayout>
+      );
+
+    case 'fruitPerWeek':
+      return (
+        <QuestionLayout
+          step={9}
+          totalSteps={totalSteps}
+          title="Wie oft essen Sie Obst in der Woche?"
+          canGoBack={true}
+          canGoNext={answers.fruitPerWeek !== null}
+          onBack={() => goBack('appetiteByOthers')}
+          onNext={() => goNext('vegetablesPerWeek')}
+        >
+          <FrequencySelector
+            value={answers.fruitPerWeek}
+            onChange={(v) => updateAnswer('fruitPerWeek', v)}
+            label="Anzahl pro Woche"
+          />
+        </QuestionLayout>
+      );
+
+    case 'vegetablesPerWeek':
+      return (
+        <QuestionLayout
+          step={10}
+          totalSteps={totalSteps}
+          title="Wie oft essen Sie Gemüse in der Woche?"
+          canGoBack={true}
+          canGoNext={answers.vegetablesPerWeek !== null}
+          onBack={() => goBack('fruitPerWeek')}
+          onNext={() => goNext('sweetPreference')}
+        >
+          <FrequencySelector
+            value={answers.vegetablesPerWeek}
+            onChange={(v) => updateAnswer('vegetablesPerWeek', v)}
+            label="Anzahl pro Woche"
+          />
+        </QuestionLayout>
+      );
+
+    case 'sweetPreference':
+      return (
+        <QuestionLayout
+          step={11}
+          totalSteps={totalSteps}
+          title="Wie gern essen Sie Süßigkeiten?"
+          canGoBack={true}
+          canGoNext={answers.sweetPreference !== null}
+          onBack={() => goBack('vegetablesPerWeek')}
+          onNext={() => goNext('meatPerWeek')}
+        >
+          <div className="grid grid-cols-2 gap-4">
+            <QuestionCard
+              selected={answers.sweetPreference === 'like'}
+              onClick={() => updateAnswer('sweetPreference', 'like')}
+            >
+              Gern
+            </QuestionCard>
+            <QuestionCard
+              selected={answers.sweetPreference === 'dislike'}
+              onClick={() => updateAnswer('sweetPreference', 'dislike')}
+            >
+              Nicht so gern
+            </QuestionCard>
+          </div>
+        </QuestionLayout>
+      );
+
+    case 'meatPerWeek':
+      return (
+        <QuestionLayout
+          step={12}
+          totalSteps={totalSteps}
+          title="Wie oft essen Sie Fleisch oder Wurstwaren in der Woche?"
+          canGoBack={true}
+          canGoNext={answers.meatPerWeek !== null}
+          onBack={() => goBack('sweetPreference')}
+          onNext={() => goNext('carbsPerWeek')}
+        >
+          <FrequencySelector
+            value={answers.meatPerWeek}
+            onChange={(v) => updateAnswer('meatPerWeek', v)}
+            label="Anzahl pro Woche"
+          />
+        </QuestionLayout>
+      );
+
+    case 'carbsPerWeek':
+      return (
+        <QuestionLayout
+          step={13}
+          totalSteps={totalSteps}
+          title="Wie oft essen Sie Kohlenhydrate?"
+          subtitle="Kartoffeln, Reis, Nudeln, Hülsenfrüchte"
+          canGoBack={true}
+          canGoNext={answers.carbsPerWeek !== null}
+          onBack={() => goBack('meatPerWeek')}
+          onNext={() => goNext('currentDiseases')}
+        >
+          <FrequencySelector
+            value={answers.carbsPerWeek}
+            onChange={(v) => updateAnswer('carbsPerWeek', v)}
+            label="Anzahl pro Woche"
+          />
+        </QuestionLayout>
+      );
+
+    case 'currentDiseases':
+      return (
+        <QuestionLayout
+          step={14}
+          totalSteps={totalSteps}
+          title="Aktuelle Erkrankungen"
+          canGoBack={true}
+          canGoNext={true}
+          onBack={() => goBack('carbsPerWeek')}
+          onNext={() => goNext('physicalCondition')}
+        >
+          <DiseaseSelector
+            value={answers.currentDiseases}
+            onChange={(v) => updateAnswer('currentDiseases', v)}
+          />
+        </QuestionLayout>
+      );
+
+    case 'physicalCondition':
+      return (
+        <QuestionLayout
+          step={15}
+          totalSteps={totalSteps}
+          title="Ihr körperliches Befinden"
+          canGoBack={true}
+          canGoNext={physicalConditionComplete}
+          onBack={() => goBack('currentDiseases')}
+          onNext={() => goNext('mobility')}
+        >
+          <PhysicalConditionQuestions
+            answers={answers}
+            onChange={updateAnswer}
+          />
+        </QuestionLayout>
+      );
+
     case 'mobility':
       return (
         <QuestionLayout
-          step={7}
+          step={16}
           totalSteps={totalSteps}
           title="Wie gut können Sie sich bewegen?"
           canGoBack={true}
           canGoNext={answers.mobilityLevel !== null}
-          onBack={() => {
-            if (answers.hasReducedEating) {
-              goBack('portionSize');
-            } else {
-              goBack('eating');
-            }
-          }}
-          onNext={() => goNext('swallowing')}
+          onBack={() => goBack('physicalCondition')}
+          onNext={() => goNext('drinkingAmount')}
         >
           <MobilitySelector
             value={answers.mobilityLevel}
@@ -323,64 +508,221 @@ export function ScreeningWizard({
         </QuestionLayout>
       );
 
+    case 'drinkingAmount':
+      return (
+        <QuestionLayout
+          step={17}
+          totalSteps={totalSteps}
+          title="Wie viel trinken Sie am Tag?"
+          canGoBack={true}
+          canGoNext={answers.drinkingAmount !== null}
+          onBack={() => goBack('mobility')}
+          onNext={() => goNext('swallowing')}
+        >
+          <DrinkingAmountSelector
+            value={answers.drinkingAmount}
+            onChange={(v) => updateAnswer('drinkingAmount', v)}
+          />
+        </QuestionLayout>
+      );
+
     case 'swallowing':
       return (
         <QuestionLayout
-          step={8}
+          step={18}
           totalSteps={totalSteps}
-          title="Haben Sie Schluckbeschwerden oder kauen Sie schlecht?"
+          title="Haben Sie Schluckbeschwerden?"
+          subtitle="z.B. bei Entzündungen, durch Strahlentherapie, nach Operationen"
           canGoBack={true}
           canGoNext={answers.hasSwallowingIssues !== null}
-          onBack={() => goBack('mobility')}
-          onNext={() => goNext('acuteIllness')}
+          onBack={() => goBack('drinkingAmount')}
+          onNext={() => goNext('medication')}
         >
-          <div className="grid grid-cols-2 gap-4">
-            <QuestionCard
-              selected={answers.hasSwallowingIssues === true}
-              onClick={() => updateAnswer('hasSwallowingIssues', true)}
-              variant="danger"
-            >
-              Ja
-            </QuestionCard>
-            <QuestionCard
-              selected={answers.hasSwallowingIssues === false}
-              onClick={() => updateAnswer('hasSwallowingIssues', false)}
-              variant="success"
-            >
-              Nein
-            </QuestionCard>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <QuestionCard
+                selected={answers.hasSwallowingIssues === true}
+                onClick={() => updateAnswer('hasSwallowingIssues', true)}
+                variant="danger"
+              >
+                Ja
+              </QuestionCard>
+              <QuestionCard
+                selected={answers.hasSwallowingIssues === false}
+                onClick={() => updateAnswer('hasSwallowingIssues', false)}
+                variant="success"
+              >
+                Nein
+              </QuestionCard>
+            </div>
+            {answers.hasSwallowingIssues && (
+              <Input
+                placeholder="Welche Art von Beschwerden?"
+                value={answers.swallowingDetails || ''}
+                onChange={(e) => updateAnswer('swallowingDetails', e.target.value)}
+                className="text-senior-base h-14"
+              />
+            )}
           </div>
         </QuestionLayout>
       );
 
-    case 'acuteIllness':
+    case 'medication':
       return (
         <QuestionLayout
-          step={8}
+          step={19}
           totalSteps={totalSteps}
-          title="Wurden Sie gerade operiert oder haben eine schwere Infektion?"
-          subtitle="Z.B. Lungenentzündung, große OP"
+          title="Nehmen Sie regelmäßig Medikamente ein?"
           canGoBack={true}
-          canGoNext={answers.hasAcuteIllness !== null}
-          isLastStep={true}
+          canGoNext={answers.takesMedication !== null}
           onBack={() => goBack('swallowing')}
+          onNext={() => goNext('supplements')}
+        >
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <QuestionCard
+                selected={answers.takesMedication === true}
+                onClick={() => updateAnswer('takesMedication', true)}
+              >
+                Ja
+              </QuestionCard>
+              <QuestionCard
+                selected={answers.takesMedication === false}
+                onClick={() => updateAnswer('takesMedication', false)}
+              >
+                Nein
+              </QuestionCard>
+            </div>
+            {answers.takesMedication && (
+              <Textarea
+                placeholder="Welche Medikamente nehmen Sie ein?"
+                value={answers.medicationDetails || ''}
+                onChange={(e) => updateAnswer('medicationDetails', e.target.value)}
+                className="text-senior-base min-h-[100px]"
+              />
+            )}
+          </div>
+        </QuestionLayout>
+      );
+
+    case 'supplements':
+      return (
+        <QuestionLayout
+          step={20}
+          totalSteps={totalSteps}
+          title="Haben Sie Erfahrungen mit Nahrungsergänzungsmitteln?"
+          canGoBack={true}
+          canGoNext={answers.hasSupplementExperience !== null}
+          onBack={() => goBack('medication')}
+          onNext={() => {
+            if (answers.hasSupplementExperience) {
+              goNext('nutritionTherapy');
+            } else {
+              goNext('nutritionTherapy');
+            }
+          }}
+        >
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <QuestionCard
+                selected={answers.hasSupplementExperience === true}
+                onClick={() => updateAnswer('hasSupplementExperience', true)}
+              >
+                Ja
+              </QuestionCard>
+              <QuestionCard
+                selected={answers.hasSupplementExperience === false}
+                onClick={() => updateAnswer('hasSupplementExperience', false)}
+              >
+                Nein
+              </QuestionCard>
+            </div>
+            {answers.hasSupplementExperience && (
+              <Textarea
+                placeholder="Welche Nahrungsergänzungsmittel haben Sie verwendet?"
+                value={answers.supplementDetails || ''}
+                onChange={(e) => updateAnswer('supplementDetails', e.target.value)}
+                className="text-senior-base min-h-[100px]"
+              />
+            )}
+          </div>
+        </QuestionLayout>
+      );
+
+    case 'nutritionTherapy':
+      return (
+        <QuestionLayout
+          step={21}
+          totalSteps={totalSteps}
+          title="Hatten Sie schon mal eine Ernährungstherapie?"
+          subtitle="z.B. verschreibungspflichtige Produkte wie Fresubin"
+          canGoBack={true}
+          canGoNext={answers.hadNutritionTherapy !== null}
+          onBack={() => goBack('supplements')}
+          onNext={() => goNext('infusions')}
+        >
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <QuestionCard
+                selected={answers.hadNutritionTherapy === true}
+                onClick={() => updateAnswer('hadNutritionTherapy', true)}
+              >
+                Ja
+              </QuestionCard>
+              <QuestionCard
+                selected={answers.hadNutritionTherapy === false}
+                onClick={() => updateAnswer('hadNutritionTherapy', false)}
+              >
+                Nein
+              </QuestionCard>
+            </div>
+            {answers.hadNutritionTherapy && (
+              <Textarea
+                placeholder="Welche Produkte oder Therapien?"
+                value={answers.nutritionTherapyDetails || ''}
+                onChange={(e) => updateAnswer('nutritionTherapyDetails', e.target.value)}
+                className="text-senior-base min-h-[100px]"
+              />
+            )}
+          </div>
+        </QuestionLayout>
+      );
+
+    case 'infusions':
+      return (
+        <QuestionLayout
+          step={22}
+          totalSteps={totalSteps}
+          title="Hatten Sie schon mal Infusionen mit Nährstoffen erhalten?"
+          canGoBack={true}
+          canGoNext={answers.hadNutrientInfusions !== null}
+          isLastStep={true}
+          onBack={() => goBack('nutritionTherapy')}
           onNext={finishScreening}
         >
-          <div className="grid grid-cols-2 gap-4">
-            <QuestionCard
-              selected={answers.hasAcuteIllness === true}
-              onClick={() => updateAnswer('hasAcuteIllness', true)}
-              variant="danger"
-            >
-              Ja
-            </QuestionCard>
-            <QuestionCard
-              selected={answers.hasAcuteIllness === false}
-              onClick={() => updateAnswer('hasAcuteIllness', false)}
-              variant="success"
-            >
-              Nein
-            </QuestionCard>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <QuestionCard
+                selected={answers.hadNutrientInfusions === true}
+                onClick={() => updateAnswer('hadNutrientInfusions', true)}
+              >
+                Ja
+              </QuestionCard>
+              <QuestionCard
+                selected={answers.hadNutrientInfusions === false}
+                onClick={() => updateAnswer('hadNutrientInfusions', false)}
+              >
+                Nein
+              </QuestionCard>
+            </div>
+            {answers.hadNutrientInfusions && (
+              <Textarea
+                placeholder="Welche Infusionen und wie oft?"
+                value={answers.infusionDetails || ''}
+                onChange={(e) => updateAnswer('infusionDetails', e.target.value)}
+                className="text-senior-base min-h-[100px]"
+              />
+            )}
           </div>
         </QuestionLayout>
       );
