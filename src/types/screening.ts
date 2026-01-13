@@ -57,7 +57,7 @@ export interface ScreeningAnswers {
   shortnessOfBreath: boolean | null;
   
   // Mobility and swallowing
-  mobilityLevel: 'bedridden' | 'indoor' | 'outdoor' | null;
+  mobilityLevel: 'indoor' | 'outdoor' | null;
   drinkingAmount: DrinkingAmount | null;
   hasSwallowingIssues: boolean | null;
   swallowingDetails?: string;
