@@ -47,7 +47,7 @@ export function ScreeningWizard({
     setAnswers(prev => ({ ...prev, [key]: value }));
   };
 
-  const totalSteps = 19;
+  const totalSteps = 20;
 
   const getStepNumber = (): number => {
     const stepOrder: WizardStep[] = [
