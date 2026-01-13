@@ -17,7 +17,7 @@ const diseaseQuestions = [
 ];
 
 export function DiseaseSelector({ value, onChange }: DiseaseSelectorProps) {
-  const updateDisease = (key: keyof CurrentDiseases, newValue: boolean | string) => {
+  const updateDisease = (key: keyof CurrentDiseases, newValue: boolean | string | null) => {
     onChange({ ...value, [key]: newValue });
   };
 
