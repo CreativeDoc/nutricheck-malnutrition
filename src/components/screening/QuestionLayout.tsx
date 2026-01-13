@@ -32,37 +32,39 @@ export function QuestionLayout({
   className,
 }: QuestionLayoutProps) {
   return (
-    <div className={cn("min-h-screen flex flex-col bg-background", className)}>
+    <div className={cn("h-screen max-h-screen flex flex-col bg-background overflow-hidden", className)}>
       {/* Header with Progress */}
-      <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border px-6 py-4">
+      <header className="flex-shrink-0 bg-background/95 backdrop-blur-sm border-b border-border px-4 py-2">
         <WizardProgress currentStep={step} totalSteps={totalSteps} />
       </header>
 
       {/* Question Content */}
-      <main className="flex-1 flex flex-col px-6 py-8 max-w-2xl mx-auto w-full">
-        <div className="text-center mb-8">
-          <h1 className="text-senior-2xl font-bold text-foreground mb-3">
+      <main className="flex-1 flex flex-col px-4 py-3 max-w-2xl mx-auto w-full min-h-0">
+        <div className="text-center mb-3 flex-shrink-0">
+          <h1 className="text-xl md:text-2xl font-bold text-foreground mb-1">
             {title}
           </h1>
           {subtitle && (
-            <p className="text-senior-lg text-muted-foreground">
+            <p className="text-base text-muted-foreground">
               {subtitle}
             </p>
           )}
         </div>
 
-        <div className="flex-1 flex flex-col justify-center">
+        <div className="flex-1 flex flex-col justify-center min-h-0 overflow-y-auto">
           {children}
         </div>
 
-        <WizardNavigation
-          onBack={onBack}
-          onNext={onNext}
-          canGoBack={canGoBack}
-          canGoNext={canGoNext}
-          isLastStep={isLastStep}
-          nextLabel={nextLabel}
-        />
+        <div className="flex-shrink-0 pt-2">
+          <WizardNavigation
+            onBack={onBack}
+            onNext={onNext}
+            canGoBack={canGoBack}
+            canGoNext={canGoNext}
+            isLastStep={isLastStep}
+            nextLabel={nextLabel}
+          />
+        </div>
       </main>
     </div>
   );

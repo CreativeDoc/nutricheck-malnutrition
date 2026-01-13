@@ -16,30 +16,30 @@ const mealOptions = [
 
 export function MealsPerDaySelector({ value, onChange }: MealsPerDaySelectorProps) {
   return (
-    <div className="grid grid-cols-1 gap-4">
+    <div className="grid grid-cols-1 gap-2">
       {mealOptions.map((option) => (
         <button
           key={option.value}
           onClick={() => onChange(option.value)}
           className={cn(
-            "touch-card flex items-center gap-4 p-5 transition-all duration-200",
+            "flex items-center gap-3 p-3 transition-all duration-200 rounded-xl border-2",
             value === option.value
-              ? "ring-4 ring-primary bg-primary/10 border-primary"
-              : "hover:bg-muted/50"
+              ? "ring-2 ring-primary bg-primary/10 border-primary"
+              : "border-border bg-card hover:bg-muted/50"
           )}
         >
-          <div className="flex gap-1">
+          <div className="flex gap-0.5">
             {Array.from({ length: Math.min(option.value, 5) }).map((_, i) => (
               <UtensilsCrossed 
                 key={i} 
                 className={cn(
-                  "w-8 h-8",
+                  "w-5 h-5",
                   value === option.value ? "text-primary" : "text-muted-foreground"
                 )} 
               />
             ))}
           </div>
-          <span className="text-senior-lg font-medium">{option.label}</span>
+          <span className="text-base font-medium">{option.label}</span>
         </button>
       ))}
     </div>

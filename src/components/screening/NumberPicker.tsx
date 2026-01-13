@@ -31,28 +31,29 @@ export function NumberPicker({
   };
 
   return (
-    <div className="flex flex-col items-center gap-6">
-      <span className="text-senior-lg text-muted-foreground">{label}</span>
+    <div className="flex flex-col items-center gap-3">
+      <span className="text-base text-muted-foreground">{label}</span>
       
-      <div className="flex items-center gap-8">
+      <div className="flex items-center gap-6">
         <button
           type="button"
           onClick={decrease}
           disabled={value <= min}
           className={cn(
-            "number-picker-btn bg-muted hover:bg-muted/80 text-foreground",
+            "w-14 h-14 rounded-xl flex items-center justify-center transition-colors",
+            "bg-muted hover:bg-muted/80 text-foreground",
             "disabled:opacity-40 disabled:cursor-not-allowed"
           )}
           aria-label="Verringern"
         >
-          <Minus className="w-8 h-8" />
+          <Minus className="w-6 h-6" />
         </button>
 
-        <div className="flex items-baseline gap-2 min-w-[140px] justify-center">
-          <span className="text-senior-3xl font-bold text-foreground tabular-nums">
+        <div className="flex items-baseline gap-1 min-w-[100px] justify-center">
+          <span className="text-4xl font-bold text-foreground tabular-nums">
             {value.toFixed(step < 1 ? 1 : 0)}
           </span>
-          <span className="text-senior-lg text-muted-foreground">{unit}</span>
+          <span className="text-lg text-muted-foreground">{unit}</span>
         </div>
 
         <button
@@ -60,17 +61,18 @@ export function NumberPicker({
           onClick={increase}
           disabled={value >= max}
           className={cn(
-            "number-picker-btn bg-primary hover:bg-primary-light text-primary-foreground",
+            "w-14 h-14 rounded-xl flex items-center justify-center transition-colors",
+            "bg-primary hover:bg-primary/90 text-primary-foreground",
             "disabled:opacity-40 disabled:cursor-not-allowed"
           )}
           aria-label="Erhöhen"
         >
-          <Plus className="w-8 h-8" />
+          <Plus className="w-6 h-6" />
         </button>
       </div>
 
       {/* Quick adjust buttons */}
-      <div className="flex gap-3">
+      <div className="flex gap-2">
         {[-10, -5, 5, 10].map((delta) => (
           <button
             key={delta}
@@ -80,8 +82,8 @@ export function NumberPicker({
               onChange(Math.round(newValue * 10) / 10);
             }}
             className={cn(
-              "px-4 py-2 rounded-lg text-senior font-medium",
-              "bg-card border-2 border-border",
+              "px-3 py-1.5 rounded-lg text-sm font-medium",
+              "bg-card border border-border",
               "hover:border-primary hover:bg-accent transition-colors"
             )}
           >
