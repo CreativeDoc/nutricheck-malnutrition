@@ -5,7 +5,7 @@ import { QuestionLayout } from './QuestionLayout';
 import { QuestionCard } from './QuestionCard';
 import { NumberPicker } from './NumberPicker';
 import { PortionSelector } from './PortionSelector';
-import { MobilitySelector } from './MobilitySelector';
+
 import { GenderSelector } from './GenderSelector';
 import { FrequencySelector } from './FrequencySelector';
 import { MealsPerDaySelector } from './MealsPerDaySelector';
@@ -47,14 +47,14 @@ export function ScreeningWizard({
     setAnswers(prev => ({ ...prev, [key]: value }));
   };
 
-  const totalSteps = 20;
+  const totalSteps = 19;
 
   const getStepNumber = (): number => {
     const stepOrder: WizardStep[] = [
       'gender', 'height', 'weight', 'weightLoss',
       'mealsPerDay', 'portionSize', 'appetiteByOthers',
       'fruitPerWeek', 'vegetablesPerWeek', 'sweetPreference', 'meatPerWeek', 'carbsPerWeek',
-      'currentDiseases', 'physicalCondition', 'mobility', 'drinkingAmount', 'swallowing',
+      'currentDiseases', 'physicalCondition', 'drinkingAmount', 'swallowing',
       'medication', 'supplements', 'nutritionTherapy', 'infusions'
     ];
     const index = stepOrder.indexOf(currentStep);
@@ -481,7 +481,7 @@ export function ScreeningWizard({
           canGoBack={true}
           canGoNext={physicalConditionComplete}
           onBack={() => goBack('currentDiseases')}
-          onNext={() => goNext('mobility')}
+          onNext={() => goNext('drinkingAmount')}
         >
           <PhysicalConditionQuestions
             answers={answers}
@@ -490,33 +490,15 @@ export function ScreeningWizard({
         </QuestionLayout>
       );
 
-    case 'mobility':
+    case 'drinkingAmount':
       return (
         <QuestionLayout
           step={16}
           totalSteps={totalSteps}
-          title="Wie gut können Sie sich bewegen?"
-          canGoBack={true}
-          canGoNext={answers.mobilityLevel !== null}
-          onBack={() => goBack('physicalCondition')}
-          onNext={() => goNext('drinkingAmount')}
-        >
-          <MobilitySelector
-            value={answers.mobilityLevel}
-            onChange={(v) => updateAnswer('mobilityLevel', v)}
-          />
-        </QuestionLayout>
-      );
-
-    case 'drinkingAmount':
-      return (
-        <QuestionLayout
-          step={17}
-          totalSteps={totalSteps}
           title="Wie viel trinken Sie am Tag?"
           canGoBack={true}
           canGoNext={answers.drinkingAmount !== null}
-          onBack={() => goBack('mobility')}
+          onBack={() => goBack('physicalCondition')}
           onNext={() => goNext('swallowing')}
         >
           <DrinkingAmountSelector
@@ -529,7 +511,7 @@ export function ScreeningWizard({
     case 'swallowing':
       return (
         <QuestionLayout
-          step={18}
+          step={17}
           totalSteps={totalSteps}
           title="Haben Sie Schluckbeschwerden?"
           subtitle="z.B. bei Entzündungen, durch Strahlentherapie, nach Operationen"
@@ -570,7 +552,7 @@ export function ScreeningWizard({
     case 'medication':
       return (
         <QuestionLayout
-          step={19}
+          step={18}
           totalSteps={totalSteps}
           title="Nehmen Sie regelmäßig Medikamente ein?"
           canGoBack={true}
@@ -608,7 +590,7 @@ export function ScreeningWizard({
     case 'supplements':
       return (
         <QuestionLayout
-          step={20}
+          step={19}
           totalSteps={totalSteps}
           title="Haben Sie Erfahrungen mit Nahrungsergänzungsmitteln?"
           canGoBack={true}
@@ -652,7 +634,7 @@ export function ScreeningWizard({
     case 'nutritionTherapy':
       return (
         <QuestionLayout
-          step={21}
+          step={20}
           totalSteps={totalSteps}
           title="Hatten Sie schon mal eine Ernährungstherapie?"
           subtitle="z.B. verschreibungspflichtige Produkte wie Fresubin"
@@ -691,7 +673,7 @@ export function ScreeningWizard({
     case 'infusions':
       return (
         <QuestionLayout
-          step={22}
+          step={21}
           totalSteps={totalSteps}
           title="Hatten Sie schon mal Infusionen mit Nährstoffen erhalten?"
           canGoBack={true}
