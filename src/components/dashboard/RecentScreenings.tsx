@@ -1,14 +1,27 @@
+import { useState } from 'react';
 import { ScreeningResult } from '@/types/screening';
 import { cn } from '@/lib/utils';
-import { CheckCircle2, AlertTriangle, Calendar, User } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, Calendar, User, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
+import { ScreeningDetailView } from './ScreeningDetailView';
 
 interface RecentScreeningsProps {
   screenings: ScreeningResult[];
 }
 
 export function RecentScreenings({ screenings }: RecentScreeningsProps) {
+  const [selectedScreening, setSelectedScreening] = useState<ScreeningResult | null>(null);
+
+  if (selectedScreening) {
+    return (
+      <ScreeningDetailView 
+        screening={selectedScreening} 
+        onBack={() => setSelectedScreening(null)} 
+      />
+    );
+  }
+
   if (screenings.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
@@ -20,13 +33,14 @@ export function RecentScreenings({ screenings }: RecentScreeningsProps) {
   return (
     <div className="space-y-4">
       {screenings.map((screening, index) => (
-        <div
+        <button
           key={index}
+          onClick={() => setSelectedScreening(screening)}
           className={cn(
-            "p-4 rounded-xl border-2 flex items-center gap-4",
+            "w-full p-4 rounded-xl border-2 flex items-center gap-4 text-left transition-all hover:shadow-md",
             screening.isAtRisk 
-              ? "border-danger bg-danger-light" 
-              : "border-success bg-success-light"
+              ? "border-danger bg-danger-light hover:border-danger/80" 
+              : "border-success bg-success-light hover:border-success/80"
           )}
         >
           <div className={cn(
@@ -64,7 +78,9 @@ export function RecentScreenings({ screenings }: RecentScreeningsProps) {
           )}>
             {screening.isAtRisk ? 'Risiko' : 'OK'}
           </div>
-        </div>
+
+          <ChevronRight className="w-5 h-5 text-muted-foreground" />
+        </button>
       ))}
     </div>
   );
