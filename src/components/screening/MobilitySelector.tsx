@@ -1,18 +1,12 @@
 import { cn } from '@/lib/utils';
-import { Check, BedDouble, Home, Trees } from 'lucide-react';
+import { Check, Home, Trees } from 'lucide-react';
 
 interface MobilitySelectorProps {
-  value: 'bedridden' | 'indoor' | 'outdoor' | null;
-  onChange: (value: 'bedridden' | 'indoor' | 'outdoor') => void;
+  value: 'indoor' | 'outdoor' | null;
+  onChange: (value: 'indoor' | 'outdoor') => void;
 }
 
 const mobilityOptions = [
-  { 
-    value: 'bedridden' as const, 
-    label: 'Bettlägerig', 
-    description: 'Ich liege meist im Bett',
-    icon: BedDouble
-  },
   { 
     value: 'indoor' as const, 
     label: 'Im Haus mobil', 
