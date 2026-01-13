@@ -31,17 +31,19 @@ export function RecentScreenings({ screenings }: RecentScreeningsProps) {
   }
 
   return (
-    <div className="space-y-4 -mx-2 px-2 py-1">
+    <div className="space-y-4 overflow-visible">
       {screenings.map((screening, index) => (
         <button
           key={index}
           onClick={() => setSelectedScreening(screening)}
           className={cn(
             "w-full p-4 rounded-xl border-2 flex items-center gap-4 text-left transition-all hover:shadow-md",
+            "outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary",
             screening.isAtRisk 
               ? "border-danger bg-danger-light hover:border-danger/80" 
               : "border-success bg-success-light hover:border-success/80"
           )}
+          style={{ margin: '2px' }}
         >
           <div className={cn(
             "w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0",
