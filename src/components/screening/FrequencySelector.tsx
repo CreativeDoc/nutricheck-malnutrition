@@ -17,21 +17,21 @@ const frequencyOptions: { value: FrequencyPerWeek; label: string }[] = [
 
 export function FrequencySelector({ value, onChange, label }: FrequencySelectorProps) {
   return (
-    <div className="space-y-4">
-      <p className="text-senior-lg text-muted-foreground text-center mb-6">{label}</p>
-      <div className="grid grid-cols-1 gap-3">
+    <div className="space-y-2">
+      <p className="text-base text-muted-foreground text-center mb-3">{label}</p>
+      <div className="grid grid-cols-1 gap-2">
         {frequencyOptions.map((option) => (
           <button
             key={option.value}
             onClick={() => onChange(option.value)}
             className={cn(
-              "touch-card p-5 text-center transition-all duration-200",
+              "p-3 text-center transition-all duration-200 rounded-xl border-2",
               value === option.value
-                ? "ring-4 ring-primary bg-primary/10 border-primary"
-                : "hover:bg-muted/50"
+                ? "ring-2 ring-primary bg-primary/10 border-primary"
+                : "border-border bg-card hover:bg-muted/50"
             )}
           >
-            <span className="text-senior-lg font-medium">{option.label}</span>
+            <span className="text-base font-medium">{option.label}</span>
           </button>
         ))}
       </div>

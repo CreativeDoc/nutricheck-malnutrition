@@ -20,15 +20,15 @@ export function WizardNavigation({
   nextLabel,
 }: WizardNavigationProps) {
   return (
-    <div className="flex gap-4 mt-8">
+    <div className="flex gap-3">
       {canGoBack && onBack && (
         <Button
           type="button"
           variant="outline"
           onClick={onBack}
-          className="btn-xl flex-1 gap-3"
+          className="flex-1 gap-2 h-12 text-base"
         >
-          <ArrowLeft className="w-6 h-6" />
+          <ArrowLeft className="w-5 h-5" />
           Zurück
         </Button>
       )}
@@ -39,15 +39,15 @@ export function WizardNavigation({
           onClick={onNext}
           disabled={!canGoNext}
           className={cn(
-            "btn-xl flex-1 gap-3",
+            "flex-1 gap-2 h-12 text-base",
             isLastStep && "bg-success hover:bg-success/90"
           )}
         >
           {nextLabel || (isLastStep ? 'Ergebnis anzeigen' : 'Weiter')}
           {isLastStep ? (
-            <Check className="w-6 h-6" />
+            <Check className="w-5 h-5" />
           ) : (
-            <ArrowRight className="w-6 h-6" />
+            <ArrowRight className="w-5 h-5" />
           )}
         </Button>
       )}

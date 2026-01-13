@@ -27,26 +27,26 @@ const genderOptions: { value: Gender; label: string; icon: React.ReactNode }[] =
 
 export function GenderSelector({ value, onChange }: GenderSelectorProps) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3">
       {genderOptions.map((option) => (
         <button
           key={option.value}
           onClick={() => onChange(option.value)}
           className={cn(
-            "touch-card flex items-center gap-6 p-6",
+            "flex items-center gap-4 p-4 rounded-xl border-2",
             "transition-all duration-200",
             value === option.value
-              ? "ring-4 ring-primary bg-primary/10 border-primary"
-              : "hover:bg-muted/50"
+              ? "ring-2 ring-primary bg-primary/10 border-primary"
+              : "border-border bg-card hover:bg-muted/50"
           )}
         >
           <div className={cn(
-            "flex items-center justify-center w-20 h-20 rounded-full",
+            "flex items-center justify-center w-12 h-12 rounded-full",
             value === option.value ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
           )}>
-            {option.icon}
+            <User className="w-6 h-6" />
           </div>
-          <span className="text-senior-xl font-semibold">{option.label}</span>
+          <span className="text-lg font-semibold">{option.label}</span>
         </button>
       ))}
     </div>

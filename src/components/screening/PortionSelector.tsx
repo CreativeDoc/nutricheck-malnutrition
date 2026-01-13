@@ -15,7 +15,7 @@ const portions = [
 
 export function PortionSelector({ value, onChange }: PortionSelectorProps) {
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-2 gap-3">
       {portions.map((portion) => {
         const isSelected = value === portion.value;
         const fillPercentage = portion.value;
@@ -26,20 +26,22 @@ export function PortionSelector({ value, onChange }: PortionSelectorProps) {
             type="button"
             onClick={() => onChange(portion.value)}
             className={cn(
-              "touch-card flex-col relative p-6",
-              isSelected ? "touch-card-selected" : "touch-card-unselected"
+              "flex flex-col items-center relative p-3 rounded-xl border-2 transition-all",
+              isSelected 
+                ? "ring-2 ring-primary border-primary bg-primary/10" 
+                : "border-border bg-card hover:bg-muted/50"
             )}
           >
             {isSelected && (
-              <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-primary flex items-center justify-center">
-                <Check className="w-4 h-4 text-primary-foreground" />
+              <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                <Check className="w-3 h-3 text-primary-foreground" />
               </div>
             )}
 
             {/* Plate visualization */}
-            <div className="relative w-24 h-24 mb-4">
+            <div className="relative w-16 h-16 mb-2">
               {/* Plate outline */}
-              <div className="absolute inset-0 rounded-full border-4 border-muted-foreground/30" />
+              <div className="absolute inset-0 rounded-full border-3 border-muted-foreground/30" />
               
               {/* Filled portion */}
               <div 
@@ -54,10 +56,10 @@ export function PortionSelector({ value, onChange }: PortionSelectorProps) {
               />
             </div>
 
-            <span className="text-senior-lg font-semibold text-foreground">
+            <span className="text-base font-semibold text-foreground">
               {portion.label}
             </span>
-            <span className="text-senior text-muted-foreground">
+            <span className="text-sm text-muted-foreground">
               {portion.description}
             </span>
           </button>
