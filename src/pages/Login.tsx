@@ -6,10 +6,9 @@ import { Activity, LogIn, Eye, EyeOff } from 'lucide-react';
 
 interface LoginProps {
   onLogin: () => void;
-  onTestScreening?: () => void;
 }
 
-export function Login({ onLogin, onTestScreening }: LoginProps) {
+export function Login({ onLogin }: LoginProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -99,17 +98,6 @@ export function Login({ onLogin, onTestScreening }: LoginProps) {
           <p className="text-center text-sm text-muted-foreground mt-6">
             Demo-Modus: Beliebige Zugangsdaten verwenden
           </p>
-
-          {/* Test Button */}
-          {onTestScreening && (
-            <Button 
-              variant="outline" 
-              onClick={onTestScreening}
-              className="w-full mt-4 gap-2"
-            >
-              🧪 Test-Screening starten
-            </Button>
-          )}
         </div>
       </div>
 
