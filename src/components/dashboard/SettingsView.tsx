@@ -205,7 +205,7 @@ export function SettingsView({ screenings, practiceData, onPracticeDataChange }:
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="overflow-visible">
           <RecentScreenings screenings={screenings} />
         </CardContent>
       </Card>
