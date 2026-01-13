@@ -1,11 +1,20 @@
 import { CurrentDiseases } from '@/types/screening';
-import { QuestionCard } from './QuestionCard';
 import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
+import { Check, X } from 'lucide-react';
 
 interface DiseaseSelectorProps {
   value: CurrentDiseases;
   onChange: (value: CurrentDiseases) => void;
 }
+
+const diseaseQuestions = [
+  { key: 'cancer' as const, label: 'Krebs', hasDetails: true, detailsKey: 'cancerType' as const, placeholder: 'Welche Art?' },
+  { key: 'pneumonia' as const, label: 'Lungenentzündung' },
+  { key: 'heartFailure' as const, label: 'Schwere Herzinsuffizienz' },
+  { key: 'stroke' as const, label: 'Schlaganfall' },
+  { key: 'digestiveIssues' as const, label: 'Verdauungsprobleme', hasDetails: true, detailsKey: 'digestiveDetails' as const, placeholder: 'Welche Beschwerden?' },
+];
 
 export function DiseaseSelector({ value, onChange }: DiseaseSelectorProps) {
   const updateDisease = (key: keyof CurrentDiseases, newValue: boolean | string) => {
@@ -13,62 +22,58 @@ export function DiseaseSelector({ value, onChange }: DiseaseSelectorProps) {
   };
 
   return (
-    <div className="space-y-3">
-      {/* Cancer */}
-      <div className="flex items-center justify-between p-2 rounded-lg border border-border">
-        <span className="text-sm font-medium flex-1">Krebs</span>
-        <div className="flex gap-2">
-          <QuestionCard selected={value.cancer === true} onClick={() => updateDisease('cancer', true)} size="compact" className="w-16">Ja</QuestionCard>
-          <QuestionCard selected={value.cancer === false} onClick={() => updateDisease('cancer', false)} size="compact" className="w-16">Nein</QuestionCard>
+    <div className="space-y-2">
+      {diseaseQuestions.map((q) => (
+        <div key={q.key}>
+          <div className="flex items-center justify-between p-2 rounded-lg border border-border">
+            <p className="text-sm font-medium flex-1 pr-2">{q.label}</p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => updateDisease(q.key, true)}
+                className={cn(
+                  "flex items-center justify-center gap-1 px-3 py-2 rounded-lg border-2 transition-all min-w-[60px]",
+                  value[q.key] === true
+                    ? "bg-destructive/10 border-destructive text-destructive"
+                    : "border-border hover:bg-muted/50"
+                )}
+              >
+                <Check className="w-4 h-4" />
+                <span className="text-sm font-medium">Ja</span>
+              </button>
+              <button
+                onClick={() => updateDisease(q.key, false)}
+                className={cn(
+                  "flex items-center justify-center gap-1 px-3 py-2 rounded-lg border-2 transition-all min-w-[60px]",
+                  value[q.key] === false
+                    ? "bg-success/10 border-success text-success"
+                    : "border-border hover:bg-muted/50"
+                )}
+              >
+                <X className="w-4 h-4" />
+                <span className="text-sm font-medium">Nein</span>
+              </button>
+            </div>
+          </div>
+          {q.hasDetails && value[q.key] === true && (
+            <Input 
+              placeholder={q.placeholder} 
+              value={(value[q.detailsKey!] as string) || ''} 
+              onChange={(e) => updateDisease(q.detailsKey!, e.target.value)} 
+              className="text-sm h-10 mt-1" 
+            />
+          )}
         </div>
-      </div>
-      {value.cancer && (
-        <Input placeholder="Welche Art?" value={value.cancerType || ''} onChange={(e) => updateDisease('cancerType', e.target.value)} className="text-sm h-10" />
-      )}
-
-      {/* Pneumonia */}
-      <div className="flex items-center justify-between p-2 rounded-lg border border-border">
-        <span className="text-sm font-medium flex-1">Lungenentzündung</span>
-        <div className="flex gap-2">
-          <QuestionCard selected={value.pneumonia === true} onClick={() => updateDisease('pneumonia', true)} size="compact" className="w-16">Ja</QuestionCard>
-          <QuestionCard selected={value.pneumonia === false} onClick={() => updateDisease('pneumonia', false)} size="compact" className="w-16">Nein</QuestionCard>
-        </div>
-      </div>
-
-      {/* Heart Failure */}
-      <div className="flex items-center justify-between p-2 rounded-lg border border-border">
-        <span className="text-sm font-medium flex-1">Schwere Herzinsuffizienz</span>
-        <div className="flex gap-2">
-          <QuestionCard selected={value.heartFailure === true} onClick={() => updateDisease('heartFailure', true)} size="compact" className="w-16">Ja</QuestionCard>
-          <QuestionCard selected={value.heartFailure === false} onClick={() => updateDisease('heartFailure', false)} size="compact" className="w-16">Nein</QuestionCard>
-        </div>
-      </div>
-
-      {/* Stroke */}
-      <div className="flex items-center justify-between p-2 rounded-lg border border-border">
-        <span className="text-sm font-medium flex-1">Schlaganfall</span>
-        <div className="flex gap-2">
-          <QuestionCard selected={value.stroke === true} onClick={() => updateDisease('stroke', true)} size="compact" className="w-16">Ja</QuestionCard>
-          <QuestionCard selected={value.stroke === false} onClick={() => updateDisease('stroke', false)} size="compact" className="w-16">Nein</QuestionCard>
-        </div>
-      </div>
-
-      {/* Digestive Issues */}
-      <div className="flex items-center justify-between p-2 rounded-lg border border-border">
-        <span className="text-sm font-medium flex-1">Verdauungsprobleme</span>
-        <div className="flex gap-2">
-          <QuestionCard selected={value.digestiveIssues === true} onClick={() => updateDisease('digestiveIssues', true)} size="compact" className="w-16">Ja</QuestionCard>
-          <QuestionCard selected={value.digestiveIssues === false} onClick={() => updateDisease('digestiveIssues', false)} size="compact" className="w-16">Nein</QuestionCard>
-        </div>
-      </div>
-      {value.digestiveIssues && (
-        <Input placeholder="Welche Beschwerden?" value={value.digestiveDetails || ''} onChange={(e) => updateDisease('digestiveDetails', e.target.value)} className="text-sm h-10" />
-      )}
+      ))}
 
       {/* Other Diseases */}
       <div className="p-2 rounded-lg border border-border">
         <span className="text-sm font-medium block mb-2">Andere Erkrankungen</span>
-        <Input placeholder="Falls ja, welche?" value={value.otherDiseases || ''} onChange={(e) => updateDisease('otherDiseases', e.target.value)} className="text-sm h-10" />
+        <Input 
+          placeholder="Falls ja, welche?" 
+          value={value.otherDiseases || ''} 
+          onChange={(e) => updateDisease('otherDiseases', e.target.value)} 
+          className="text-sm h-10" 
+        />
       </div>
     </div>
   );
