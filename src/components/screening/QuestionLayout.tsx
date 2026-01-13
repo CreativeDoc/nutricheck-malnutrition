@@ -51,8 +51,10 @@ export function QuestionLayout({
           )}
         </div>
 
-        <div className="flex-1 flex flex-col justify-center min-h-0 overflow-y-auto">
-          {children}
+        <div className="flex-1 flex flex-col justify-center min-h-0 overflow-y-auto overflow-x-visible px-1 -mx-1">
+          <div className="py-1">
+            {children}
+          </div>
         </div>
 
         <div className="flex-shrink-0 pt-2">
