@@ -13,12 +13,12 @@ export type AppetiteRating = 'normal' | 'limited';
 export type SweetPreference = 'like' | 'dislike';
 
 export interface CurrentDiseases {
-  cancer: boolean;
+  cancer: boolean | null;
   cancerType?: string;
-  pneumonia: boolean;
-  heartFailure: boolean;
-  stroke: boolean;
-  digestiveIssues: boolean;
+  pneumonia: boolean | null;
+  heartFailure: boolean | null;
+  stroke: boolean | null;
+  digestiveIssues: boolean | null;
   digestiveDetails?: string;
   otherDiseases?: string;
 }
@@ -137,11 +137,11 @@ export const initialAnswers: ScreeningAnswers = {
   meatPerWeek: null,
   carbsPerWeek: null,
   currentDiseases: {
-    cancer: false,
-    pneumonia: false,
-    heartFailure: false,
-    stroke: false,
-    digestiveIssues: false,
+    cancer: null,
+    pneumonia: null,
+    heartFailure: null,
+    stroke: null,
+    digestiveIssues: null,
   },
   feelsWeaker: null,
   muscleLoss: null,
