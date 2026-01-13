@@ -31,7 +31,7 @@ export function RecentScreenings({ screenings }: RecentScreeningsProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 -mx-1 px-1">
       {screenings.map((screening, index) => (
         <button
           key={index}
