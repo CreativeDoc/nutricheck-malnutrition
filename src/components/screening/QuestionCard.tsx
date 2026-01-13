@@ -32,16 +32,11 @@ export function QuestionCard({
         selected 
           ? "ring-2 ring-primary border-primary bg-primary/10" 
           : "border-border bg-card hover:bg-muted/50",
-        variant === 'success' && selected && "ring-success border-success bg-success/10",
-        variant === 'danger' && selected && "ring-danger border-danger bg-danger/10",
         className
       )}
     >
       {selected && (
-        <div className={cn(
-          "absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center",
-          variant === 'success' ? "bg-success" : variant === 'danger' ? "bg-danger" : "bg-primary"
-        )}>
+        <div className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center bg-primary">
           <Check className="w-3 h-3 text-white" />
         </div>
       )}

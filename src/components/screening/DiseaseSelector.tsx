@@ -33,7 +33,7 @@ export function DiseaseSelector({ value, onChange }: DiseaseSelectorProps) {
                 className={cn(
                   "flex items-center justify-center gap-1 px-3 py-2 rounded-lg border-2 transition-all min-w-[60px]",
                   value[q.key] === true
-                    ? "bg-destructive/10 border-destructive text-destructive"
+                    ? "bg-primary/10 border-primary text-primary"
                     : "border-border hover:bg-muted/50"
                 )}
               >
@@ -45,7 +45,7 @@ export function DiseaseSelector({ value, onChange }: DiseaseSelectorProps) {
                 className={cn(
                   "flex items-center justify-center gap-1 px-3 py-2 rounded-lg border-2 transition-all min-w-[60px]",
                   value[q.key] === false
-                    ? "bg-success/10 border-success text-success"
+                    ? "bg-primary/10 border-primary text-primary"
                     : "border-border hover:bg-muted/50"
                 )}
               >

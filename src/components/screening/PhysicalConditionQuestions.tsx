@@ -31,9 +31,7 @@ export function PhysicalConditionQuestions({ answers, onChange }: PhysicalCondit
               className={cn(
                 "flex items-center justify-center gap-1 px-3 py-2 rounded-lg border-2 transition-all min-w-[60px]",
                 answers[q.key] === true
-                  ? q.inverted 
-                    ? "bg-success/10 border-success text-success"
-                    : "bg-destructive/10 border-destructive text-destructive"
+                  ? "bg-primary/10 border-primary text-primary"
                   : "border-border hover:bg-muted/50"
               )}
             >
@@ -45,9 +43,7 @@ export function PhysicalConditionQuestions({ answers, onChange }: PhysicalCondit
               className={cn(
                 "flex items-center justify-center gap-1 px-3 py-2 rounded-lg border-2 transition-all min-w-[60px]",
                 answers[q.key] === false
-                  ? q.inverted
-                    ? "bg-destructive/10 border-destructive text-destructive"
-                    : "bg-success/10 border-success text-success"
+                  ? "bg-primary/10 border-primary text-primary"
                   : "border-border hover:bg-muted/50"
               )}
             >
