@@ -3,6 +3,7 @@ import { Header } from '@/components/dashboard/Header';
 import { PatientForm } from '@/components/dashboard/PatientForm';
 import { SettingsView } from '@/components/dashboard/SettingsView';
 import { RecentScreenings } from '@/components/dashboard/RecentScreenings';
+import { ScreeningIntro } from '@/components/dashboard/ScreeningIntro';
 import { ScreeningWizard } from '@/components/screening/ScreeningWizard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,6 +22,7 @@ interface PracticeData {
 type DashboardView = 'home' | 'settings' | 'screenings';
 
 export function Dashboard({ onLogout }: DashboardProps) {
+  const [showIntro, setShowIntro] = useState(false);
   const [showPatientForm, setShowPatientForm] = useState(false);
   const [currentView, setCurrentView] = useState<DashboardView>('home');
   const [activePatient, setActivePatient] = useState<Patient | null>(null);
@@ -29,6 +31,15 @@ export function Dashboard({ onLogout }: DashboardProps) {
     name: 'Ihre Praxis',
     email: 'praxis@beispiel.de'
   });
+
+  const handleStartScreening = () => {
+    setShowIntro(true);
+  };
+
+  const handleIntroComplete = () => {
+    setShowIntro(false);
+    setShowPatientForm(true);
+  };
 
   const handlePatientSubmit = (patient: Patient) => {
     setActivePatient(patient);
@@ -140,7 +151,7 @@ export function Dashboard({ onLogout }: DashboardProps) {
             {/* Main Action */}
             <div>
               <Button
-                onClick={() => setShowPatientForm(true)}
+                onClick={handleStartScreening}
                 className="btn-xxl w-full gap-4 shadow-button"
               >
                 <UserPlus className="w-8 h-8" />
@@ -150,6 +161,12 @@ export function Dashboard({ onLogout }: DashboardProps) {
           </>
         )}
       </main>
+
+      <ScreeningIntro
+        open={showIntro}
+        onOpenChange={setShowIntro}
+        onContinue={handleIntroComplete}
+      />
 
       <PatientForm
         open={showPatientForm}
