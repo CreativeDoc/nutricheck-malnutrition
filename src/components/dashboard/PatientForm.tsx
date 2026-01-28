@@ -9,8 +9,9 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { UserPlus, Play } from 'lucide-react';
-import { Patient } from '@/types/screening';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { UserPlus, Play, Globe } from 'lucide-react';
+import { Patient, PatientLanguage } from '@/types/screening';
 
 interface PatientFormProps {
   open: boolean;
@@ -22,6 +23,7 @@ export function PatientForm({ open, onOpenChange, onSubmit }: PatientFormProps) 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [birthDate, setBirthDate] = useState('');
+  const [language, setLanguage] = useState<PatientLanguage>('de');
 
   const generatePatientCode = () => {
     if (!firstName || !lastName || !birthDate) return '';
@@ -38,6 +40,7 @@ export function PatientForm({ open, onOpenChange, onSubmit }: PatientFormProps) 
       patientCode: generatePatientCode(),
       initials: `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase(),
       birthDate,
+      language,
       createdAt: new Date(),
     };
 
@@ -49,6 +52,7 @@ export function PatientForm({ open, onOpenChange, onSubmit }: PatientFormProps) 
     setFirstName('');
     setLastName('');
     setBirthDate('');
+    setLanguage('de');
   };
 
   const patientCode = generatePatientCode();
@@ -109,6 +113,29 @@ export function PatientForm({ open, onOpenChange, onSubmit }: PatientFormProps) 
               className="text-senior h-14"
               max={new Date().toISOString().split('T')[0]}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="language" className="text-senior flex items-center gap-2">
+              <Globe className="w-4 h-4" />
+              Sprache des Patienten
+            </Label>
+            <Select value={language} onValueChange={(value) => setLanguage(value as PatientLanguage)}>
+              <SelectTrigger className="h-14 text-senior">
+                <SelectValue placeholder="Sprache wählen" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover">
+                <SelectItem value="de" className="text-senior py-3">
+                  🇩🇪 Deutsch
+                </SelectItem>
+                <SelectItem value="en" className="text-senior py-3">
+                  🇬🇧 English
+                </SelectItem>
+                <SelectItem value="ru" className="text-senior py-3">
+                  🇷🇺 Русский
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {patientCode && (

@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { Header } from '@/components/dashboard/Header';
 import { PatientForm } from '@/components/dashboard/PatientForm';
 import { SettingsView } from '@/components/dashboard/SettingsView';
+import { RecentScreenings } from '@/components/dashboard/RecentScreenings';
 import { ScreeningWizard } from '@/components/screening/ScreeningWizard';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Patient, ScreeningResult } from '@/types/screening';
-import { UserPlus, Activity, ArrowLeft } from 'lucide-react';
+import { UserPlus, Activity, ArrowLeft, ClipboardList } from 'lucide-react';
 
 interface DashboardProps {
   onLogout: () => void;
@@ -16,9 +18,11 @@ interface PracticeData {
   email: string;
 }
 
+type DashboardView = 'home' | 'settings' | 'screenings';
+
 export function Dashboard({ onLogout }: DashboardProps) {
   const [showPatientForm, setShowPatientForm] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
+  const [currentView, setCurrentView] = useState<DashboardView>('home');
   const [activePatient, setActivePatient] = useState<Patient | null>(null);
   const [screenings, setScreenings] = useState<ScreeningResult[]>([]);
   const [practiceData, setPracticeData] = useState<PracticeData>({
@@ -51,39 +55,74 @@ export function Dashboard({ onLogout }: DashboardProps) {
     );
   }
 
+  const handleViewChange = (view: DashboardView) => {
+    setCurrentView(view);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header 
         practiceName={practiceData.name}
         onLogout={onLogout} 
-        showSettings={showSettings}
-        onSettingsClick={() => setShowSettings(!showSettings)}
+        showSettings={currentView === 'settings'}
+        onSettingsClick={() => handleViewChange(currentView === 'settings' ? 'home' : 'settings')}
+        showScreenings={currentView === 'screenings'}
+        onScreeningsClick={() => handleViewChange(currentView === 'screenings' ? 'home' : 'screenings')}
       />
 
       <main className="max-w-4xl mx-auto px-6 py-8">
-        {showSettings ? (
-          <>
-            {/* Back to Dashboard */}
-            <Button
-              variant="ghost"
-              onClick={() => setShowSettings(false)}
-              className="gap-2 mb-6 -ml-2"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              Zurück zum Dashboard
-            </Button>
+        {currentView !== 'home' && (
+          <Button
+            variant="ghost"
+            onClick={() => setCurrentView('home')}
+            className="gap-2 mb-6 -ml-2"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            Zurück zum Dashboard
+          </Button>
+        )}
 
+        {currentView === 'settings' && (
+          <>
             <h2 className="text-senior-2xl font-bold text-foreground mb-8">
               Einstellungen
             </h2>
 
             <SettingsView 
-              screenings={screenings}
               practiceData={practiceData}
               onPracticeDataChange={setPracticeData}
             />
           </>
-        ) : (
+        )}
+
+        {currentView === 'screenings' && (
+          <>
+            <h2 className="text-senior-2xl font-bold text-foreground mb-8">
+              Screenings
+            </h2>
+
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <ClipboardList className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-senior-lg">Letzte Screenings</CardTitle>
+                    <CardDescription className="text-base">
+                      Übersicht der durchgeführten Screenings
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="overflow-visible">
+                <RecentScreenings screenings={screenings} />
+              </CardContent>
+            </Card>
+          </>
+        )}
+
+        {currentView === 'home' && (
           <>
             {/* Welcome Section */}
             <div className="text-center mb-12">
