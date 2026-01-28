@@ -4,9 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { RecentScreenings } from './RecentScreenings';
-import { ScreeningResult } from '@/types/screening';
-import { Globe, Building2, ClipboardList, Save, Eye, EyeOff } from 'lucide-react';
+import { Globe, Building2, Save, Eye, EyeOff } from 'lucide-react';
 
 interface PracticeData {
   name: string;
@@ -14,12 +12,11 @@ interface PracticeData {
 }
 
 interface SettingsViewProps {
-  screenings: ScreeningResult[];
   practiceData: PracticeData;
   onPracticeDataChange: (data: PracticeData) => void;
 }
 
-export function SettingsView({ screenings, practiceData, onPracticeDataChange }: SettingsViewProps) {
+export function SettingsView({ practiceData, onPracticeDataChange }: SettingsViewProps) {
   const [language, setLanguage] = useState('de');
   const [localPracticeData, setLocalPracticeData] = useState(practiceData);
   const [newPassword, setNewPassword] = useState('');
@@ -187,26 +184,6 @@ export function SettingsView({ screenings, practiceData, onPracticeDataChange }:
             <Save className="w-6 h-6" />
             {isSaving ? 'Speichern...' : 'Änderungen speichern'}
           </Button>
-        </CardContent>
-      </Card>
-
-      {/* Recent Screenings */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-              <ClipboardList className="w-6 h-6 text-primary" />
-            </div>
-            <div>
-              <CardTitle className="text-senior-lg">Letzte Screenings</CardTitle>
-              <CardDescription className="text-base">
-                Übersicht der durchgeführten Screenings
-              </CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="overflow-visible">
-          <RecentScreenings screenings={screenings} />
         </CardContent>
       </Card>
     </div>

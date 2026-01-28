@@ -1,8 +1,11 @@
+export type PatientLanguage = 'de' | 'en' | 'ru';
+
 export interface Patient {
   id: string;
   patientCode: string;
   initials: string;
   birthDate: string;
+  language: PatientLanguage;
   createdAt: Date;
 }
 
