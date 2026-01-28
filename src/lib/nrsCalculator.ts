@@ -1,4 +1,4 @@
-import { ScreeningAnswers, ScreeningResult } from '@/types/screening';
+import { ScreeningAnswers, ScreeningResult, MalnutritionLevel } from '@/types/screening';
 
 export function calculateAge(birthDate: string): number {
   const today = new Date();
@@ -21,106 +21,127 @@ export function calculateBMI(weight: number, heightCm: number): number {
 export function calculateNRSScore(answers: ScreeningAnswers, patientCode: string): ScreeningResult {
   const scores = {
     bmi: 0,
-    bmiScore: 0,
     weightLossScore: 0,
     nutritionScore: 0,
     diseaseScore: 0,
-    ageBonus: 0,
+    physicalConditionScore: 0,
+    swallowingScore: 0,
   };
 
-  // Calculate BMI Score
+  // Calculate BMI (nur anzeigen, nicht im Score)
   if (answers.weight && answers.height && !answers.weightUnknown) {
     scores.bmi = calculateBMI(answers.weight, answers.height);
-    
-    if (scores.bmi < 18.5) {
-      scores.bmiScore = 3;
-    } else if (scores.bmi < 20.5) {
-      scores.bmiScore = 2;
-    } else if (scores.bmi >= 18.5 && scores.bmi <= 20.5) {
-      scores.bmiScore = 1;
-    }
   }
 
-  // Weight Loss Score
+  // Weight Loss Score (eigene Punktzahl)
+  // ≥6 kg = 3 Punkte, 3-6 kg = 2 Punkte, 1-3 kg = 1 Punkt
   if (answers.weightUnknown) {
-    // If weight unknown, use subjective clothing criterion
     if (answers.clothingLoose === true) {
       scores.weightLossScore = 1;
     }
-  } else if (answers.hasWeightLoss === true) {
-    // Calculate weight loss percentage if we have weight
-    if (answers.weight && answers.weightLossAmount) {
-      let lossKg = 0;
-      switch (answers.weightLossAmount) {
-        case '1-3kg':
-          lossKg = 2;
-          break;
-        case '3-6kg':
-          lossKg = 4.5;
-          break;
-        case '>6kg':
-          lossKg = 7;
-          break;
-      }
-      
-      const previousWeight = answers.weight + lossKg;
-      const lossPercentage = (lossKg / previousWeight) * 100;
-      
-      if (lossPercentage > 5) {
+  } else if (answers.hasWeightLoss === true && answers.weightLossAmount) {
+    switch (answers.weightLossAmount) {
+      case '>6kg':
+        scores.weightLossScore = 3;
+        break;
+      case '3-6kg':
         scores.weightLossScore = 2;
-      } else if (lossPercentage > 0) {
+        break;
+      case '1-3kg':
         scores.weightLossScore = 1;
-      }
-    }
-  }
-
-  // Nutrition Score (based on portion size and meals per day)
-  if (answers.portionSize) {
-    switch (answers.portionSize) {
-      case 75:
-        scores.nutritionScore = 1;
-        break;
-      case 50:
-        scores.nutritionScore = 2;
-        break;
-      case 25:
-        scores.nutritionScore = 3;
         break;
     }
   }
+
+  // Nutrition Score: Mahlzeiten × Portionsgröße
+  // Mahlzeiten: 1-2 = 1 Punkt, ≥3 = 0 Punkte
+  // Portionsgröße als Multiplikator: 100% = 1, 75% = 0.75, 50% = 0.5, 25% = 0.25
+  if (answers.mealsPerDay !== null && answers.portionSize !== null) {
+    const mealsPoints = answers.mealsPerDay <= 2 ? 1 : 0;
+    const portionMultiplier = answers.portionSize / 100;
+    // Berechnung: Mahlzeiten-Punkte, aber effektive Portion berücksichtigen
+    // Wenn jemand 3 Mahlzeiten isst (0 Punkte), aber nur halbe Teller, dann:
+    // 3 × 0.5 = 1.5 effektive Mahlzeiten, was weniger als 3 ist
+    const effectiveMeals = answers.mealsPerDay * portionMultiplier;
+    
+    if (effectiveMeals < 1.5) {
+      scores.nutritionScore = 2;
+    } else if (effectiveMeals < 3) {
+      scores.nutritionScore = 1;
+    } else {
+      scores.nutritionScore = 0;
+    }
+    
+    // Mindestens Mahlzeiten-Punkte, wenn 1-2 Mahlzeiten
+    scores.nutritionScore = Math.max(scores.nutritionScore, mealsPoints);
+  }
+
+  // Disease Score
+  // Krebs und schwere Herzschwäche = je 2 Punkte
+  // Durchfall, Übelkeit/Erbrechen, Magen-Darm-OP = je 1 Punkt
+  // Andere Erkrankungen sind nur Indikatoren
   
-  // Additional nutrition factors from meals per day
-  if (answers.mealsPerDay !== null && answers.mealsPerDay < 3) {
-    scores.nutritionScore = Math.max(scores.nutritionScore, 1);
-  }
-
-  // Disease Score - patients have consuming diseases by default
-  // Add points based on severity indicators
-  const diseases = answers.currentDiseases;
-  if (diseases.cancer || diseases.heartFailure || diseases.stroke) {
-    scores.diseaseScore = 2;
-  } else if (diseases.pneumonia || diseases.digestiveIssues) {
-    scores.diseaseScore = 1;
+  const acute = answers.acuteDiseases;
+  const chronic = answers.chronicDiseases;
+  
+  // Krebs = 2 Punkte
+  if (acute.cancer === true) {
+    scores.diseaseScore += 2;
   }
   
-  // Weakness indicators add to disease score
-  if (answers.feelsWeaker || answers.muscleLoss || answers.frequentInfections) {
-    scores.diseaseScore = Math.max(scores.diseaseScore, 1);
+  // Schwere Herzschwäche = 2 Punkte
+  if (chronic.heartFailure === true) {
+    scores.diseaseScore += 2;
+  }
+  
+  // Durchfall = 1 Punkt
+  if (chronic.diarrhea === true) {
+    scores.diseaseScore += 1;
+  }
+  
+  // Übelkeit/Erbrechen = 1 Punkt
+  if (chronic.nauseaVomiting === true) {
+    scores.diseaseScore += 1;
+  }
+  
+  // Zustand nach Magen-/Darm-Operation = 1 Punkt
+  if (chronic.gastrointestinalSurgery === true) {
+    scores.diseaseScore += 1;
   }
 
-  // Age Bonus
-  const age = calculateAge(answers.birthDate);
-  if (age >= 70) {
-    scores.ageBonus = 1;
+  // Physical Condition Score
+  // 1 Punkt, sobald mindestens eine Frage mit "ja" beantwortet wurde
+  if (
+    answers.feelsWeaker === true ||
+    answers.muscleLoss === true ||
+    answers.frequentInfections === true ||
+    answers.difficultyGettingUp === true ||
+    answers.shortnessOfBreath === true
+  ) {
+    scores.physicalConditionScore = 1;
   }
 
-  // Total Score
+  // Swallowing Score
+  // 1 Punkt bei "ja"
+  if (answers.hasSwallowingIssues === true) {
+    scores.swallowingScore = 1;
+  }
+
+  // Total Score (ohne BMI und ohne Altersbonus)
   const totalScore = 
-    scores.bmiScore + 
     scores.weightLossScore + 
     scores.nutritionScore + 
     scores.diseaseScore + 
-    scores.ageBonus;
+    scores.physicalConditionScore +
+    scores.swallowingScore;
+
+  // Malnutrition Level: 0-2 = keine, ≥3 = leicht, ≥5 = schwer
+  let malnutritionLevel: MalnutritionLevel = 'none';
+  if (totalScore >= 5) {
+    malnutritionLevel = 'severe';
+  } else if (totalScore >= 3) {
+    malnutritionLevel = 'mild';
+  }
 
   const isAtRisk = totalScore >= 3;
 
@@ -138,6 +159,7 @@ export function calculateNRSScore(answers: ScreeningAnswers, patientCode: string
     answers,
     scores,
     totalScore,
+    malnutritionLevel,
     isAtRisk,
     recommendations,
     createdAt: new Date(),
@@ -145,11 +167,17 @@ export function calculateNRSScore(answers: ScreeningAnswers, patientCode: string
 }
 
 export function generateReportText(result: ScreeningResult): string {
+  const levelText = {
+    none: 'Kein Mangelernährungszustand',
+    mild: 'Leichter Mangelernährungszustand',
+    severe: 'Schwerer Mangelernährungszustand',
+  };
+
   const lines = [
     `Patient: ${result.patientCode}`,
-    `NRS-2002 Score: ${result.totalScore}`,
+    `Score: ${result.totalScore}`,
     ``,
-    `Risikobewertung: ${result.isAtRisk ? 'RISIKO FÜR MANGELERNÄHRUNG' : 'Kein erhöhtes Risiko'}`,
+    `Bewertung: ${levelText[result.malnutritionLevel]}`,
   ];
 
   if (result.isAtRisk && result.recommendations) {
@@ -161,11 +189,17 @@ export function generateReportText(result: ScreeningResult): string {
 
   lines.push(``);
   lines.push(`Score-Aufschlüsselung:`);
-  lines.push(`• BMI-Score: ${result.scores.bmiScore} (BMI: ${result.scores.bmi.toFixed(1)})`);
+  lines.push(`• BMI: ${result.scores.bmi.toFixed(1)} (nicht im Score)`);
   lines.push(`• Gewichtsverlust: ${result.scores.weightLossScore}`);
   lines.push(`• Nahrungszufuhr: ${result.scores.nutritionScore}`);
   lines.push(`• Erkrankungen: ${result.scores.diseaseScore}`);
-  lines.push(`• Alters-Bonus (≥70): ${result.scores.ageBonus}`);
+  lines.push(`• Körperliches Befinden: ${result.scores.physicalConditionScore}`);
+  lines.push(`• Schluckbeschwerden: ${result.scores.swallowingScore}`);
+
+  if (result.answers.wantsNutritionCounseling) {
+    lines.push(``);
+    lines.push(`Patient wünscht Ernährungsberatung: Ja`);
+  }
 
   return lines.join('\n');
 }

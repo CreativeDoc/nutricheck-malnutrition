@@ -5,6 +5,7 @@ import { generateReportText } from '@/lib/nrsCalculator';
 import { 
   CheckCircle2, 
   AlertTriangle, 
+  AlertOctagon,
   Copy, 
   Check,
   Home,
@@ -35,52 +36,92 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard }: Resu
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const getLevelStyles = () => {
+    switch (result.malnutritionLevel) {
+      case 'severe':
+        return {
+          bg: 'bg-destructive/10 border-destructive',
+          iconBg: 'bg-destructive',
+          text: 'text-destructive',
+          icon: AlertOctagon,
+        };
+      case 'mild':
+        return {
+          bg: 'bg-warning/10 border-warning',
+          iconBg: 'bg-warning',
+          text: 'text-warning',
+          icon: AlertTriangle,
+        };
+      default:
+        return {
+          bg: 'bg-success/10 border-success',
+          iconBg: 'bg-success',
+          text: 'text-success',
+          icon: CheckCircle2,
+        };
+    }
+  };
+
+  const getLevelTitle = () => {
+    switch (result.malnutritionLevel) {
+      case 'severe':
+        return 'Schwerer Mangelernährungszustand';
+      case 'mild':
+        return 'Leichter Mangelernährungszustand';
+      default:
+        return 'Kein Mangelernährungszustand';
+    }
+  };
+
+  const getLevelDescription = () => {
+    if (result.malnutritionLevel === 'none') {
+      return 'Es besteht kein erhöhtes Risiko für Mangelernährung.';
+    }
+    return 'Bei Ihnen besteht ein Mangelernährungszustand, der therapiert werden kann und sollte.';
+  };
+
+  const styles = getLevelStyles();
+  const IconComponent = styles.icon;
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <main className="flex-1 flex flex-col px-6 py-8 max-w-2xl mx-auto w-full">
         {/* Traffic Light Result */}
         <div className={cn(
-          "text-center p-8 rounded-3xl mb-8 animate-scale-in",
-          result.isAtRisk 
-            ? "bg-danger-light border-2 border-danger" 
-            : "bg-success-light border-2 border-success"
+          "text-center p-8 rounded-3xl mb-8 animate-scale-in border-2",
+          styles.bg
         )}>
           <div className={cn(
             "w-24 h-24 rounded-full mx-auto mb-6 flex items-center justify-center",
-            result.isAtRisk ? "bg-danger" : "bg-success"
+            styles.iconBg
           )}>
-            {result.isAtRisk ? (
-              <AlertTriangle className="w-12 h-12 text-danger-foreground" />
-            ) : (
-              <CheckCircle2 className="w-12 h-12 text-success-foreground" />
-            )}
+            <IconComponent className="w-12 h-12 text-white" />
           </div>
 
           <h1 className={cn(
             "text-senior-2xl font-bold mb-3",
-            result.isAtRisk ? "text-danger" : "text-success"
+            styles.text
           )}>
-            {result.isAtRisk 
-              ? "Risiko für Mangelernährung" 
-              : "Kein erhöhtes Risiko"}
+            {getLevelTitle()}
           </h1>
 
-          <p className="text-senior-lg text-muted-foreground">
-            NRS-2002 Score: <strong>{result.totalScore}</strong> Punkte
-            {result.isAtRisk && " (≥3 = Risiko)"}
+          <p className="text-senior-lg text-muted-foreground mb-4">
+            {getLevelDescription()}
+          </p>
+
+          <p className="text-senior text-muted-foreground">
+            Score: <strong>{result.totalScore}</strong> Punkte
+            {result.malnutritionLevel === 'mild' && " (≥3 = leicht)"}
+            {result.malnutritionLevel === 'severe' && " (≥5 = schwer)"}
           </p>
         </div>
 
         {/* At Risk Actions */}
         {result.isAtRisk && !showTherapy && (
           <div className="space-y-4 mb-8 animate-scale-in">
-            <p className="text-senior-lg text-center text-foreground mb-6">
-              Es besteht ein erhöhtes Risiko für Mangelernährung.
-            </p>
-
             <Button
               onClick={() => setShowTherapy(true)}
-              className="btn-xxl w-full bg-primary hover:bg-primary-light gap-4"
+              className="btn-xxl w-full bg-primary hover:bg-primary/90 gap-4"
             >
               <Utensils className="w-7 h-7" />
               Ernährungstherapie anzeigen
@@ -135,6 +176,15 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard }: Resu
           </div>
         )}
 
+        {/* Counseling Request */}
+        {result.answers.wantsNutritionCounseling && (
+          <div className="bg-primary/10 border-2 border-primary rounded-2xl p-6 mb-8 text-center">
+            <p className="text-senior-lg font-medium text-primary">
+              ✓ Patient wünscht Ernährungsberatung / Ernährungstherapie
+            </p>
+          </div>
+        )}
+
         {/* Score Breakdown */}
         <div className="bg-card border border-border rounded-2xl p-6 mb-8">
           <h3 className="text-senior-lg font-semibold text-foreground mb-4">
@@ -142,11 +192,12 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard }: Resu
           </h3>
           <div className="space-y-3">
             {[
-              { label: 'BMI-Score', value: result.scores.bmiScore, detail: `BMI: ${result.scores.bmi.toFixed(1)}` },
+              { label: 'BMI', value: null, detail: `${result.scores.bmi.toFixed(1)} (nicht im Score)` },
               { label: 'Gewichtsverlust', value: result.scores.weightLossScore },
               { label: 'Nahrungszufuhr', value: result.scores.nutritionScore },
               { label: 'Erkrankungen', value: result.scores.diseaseScore },
-              { label: 'Alters-Bonus (≥70)', value: result.scores.ageBonus },
+              { label: 'Körperliches Befinden', value: result.scores.physicalConditionScore },
+              { label: 'Schluckbeschwerden', value: result.scores.swallowingScore },
             ].map((item) => (
               <div key={item.label} className="flex justify-between items-center">
                 <span className="text-senior text-muted-foreground">
@@ -155,21 +206,25 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard }: Resu
                     <span className="text-sm ml-2">({item.detail})</span>
                   )}
                 </span>
-                <span className={cn(
-                  "text-senior font-semibold px-3 py-1 rounded-full",
-                  item.value > 0 ? "bg-warning-light text-warning" : "bg-muted text-muted-foreground"
-                )}>
-                  {item.value}
-                </span>
+                {item.value !== null && (
+                  <span className={cn(
+                    "text-senior font-semibold px-3 py-1 rounded-full",
+                    item.value > 0 ? "bg-warning/20 text-warning" : "bg-muted text-muted-foreground"
+                  )}>
+                    {item.value}
+                  </span>
+                )}
               </div>
             ))}
             <div className="border-t border-border pt-3 mt-3 flex justify-between items-center">
               <span className="text-senior-lg font-bold text-foreground">Gesamt</span>
               <span className={cn(
                 "text-senior-lg font-bold px-4 py-1 rounded-full",
-                result.isAtRisk 
-                  ? "bg-danger-light text-danger" 
-                  : "bg-success-light text-success"
+                result.malnutritionLevel === 'severe' 
+                  ? "bg-destructive/20 text-destructive"
+                  : result.malnutritionLevel === 'mild'
+                    ? "bg-warning/20 text-warning"
+                    : "bg-success/20 text-success"
               )}>
                 {result.totalScore}
               </span>
