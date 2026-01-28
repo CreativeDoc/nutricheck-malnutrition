@@ -15,14 +15,24 @@ export type DrinkingAmount = '<1l' | '1.5l' | '>1.5l';
 export type AppetiteRating = 'normal' | 'limited';
 export type SweetPreference = 'like' | 'dislike';
 
-export interface CurrentDiseases {
+// Aktuelle Erkrankungen (temporär/akut)
+export interface AcuteDiseases {
   cancer: boolean | null;
   cancerType?: string;
-  pneumonia: boolean | null;
-  heartFailure: boolean | null;
+  acuteInfection: boolean | null;
+  acuteInfectionDetails?: string;
+}
+
+// Chronische Erkrankungen
+export interface ChronicDiseases {
+  heartFailure: boolean | null; // Herzschwäche (mit Wasser in den Beinen/Ödemen)
+  rheumatism: boolean | null;
+  lungDisease: boolean | null;
+  kidneyDisease: boolean | null;
   stroke: boolean | null;
-  digestiveIssues: boolean | null;
-  digestiveDetails?: string;
+  diarrhea: boolean | null;
+  nauseaVomiting: boolean | null;
+  gastrointestinalSurgery: boolean | null;
   otherDiseases?: string;
 }
 
@@ -31,6 +41,7 @@ export interface ScreeningAnswers {
   gender: Gender | null;
   height: number | null;
   weight: number | null;
+  normalWeight: number | null; // Normalgewicht
   weightUnknown: boolean;
   hasWeightLoss: boolean | null;
   weightLossAmount: 'none' | '1-3kg' | '3-6kg' | '>6kg' | null;
@@ -41,21 +52,21 @@ export interface ScreeningAnswers {
   portionSize: 100 | 75 | 50 | 25 | null;
   appetiteByOthers: AppetiteRating | null;
   
-  // Food frequency
+  // Food frequency (Indikatoren, keine Punkte)
   fruitPerWeek: FrequencyPerWeek | null;
   vegetablesPerWeek: FrequencyPerWeek | null;
   sweetPreference: SweetPreference | null;
   meatPerWeek: FrequencyPerWeek | null;
   carbsPerWeek: FrequencyPerWeek | null;
   
-  // Current diseases
-  currentDiseases: CurrentDiseases;
+  // Diseases
+  acuteDiseases: AcuteDiseases;
+  chronicDiseases: ChronicDiseases;
   
   // Physical condition
   feelsWeaker: boolean | null;
   muscleLoss: boolean | null;
   frequentInfections: boolean | null;
-  getsOutdoors: boolean | null;
   difficultyGettingUp: boolean | null;
   shortnessOfBreath: boolean | null;
   
@@ -74,20 +85,26 @@ export interface ScreeningAnswers {
   nutritionTherapyDetails?: string;
   hadNutrientInfusions: boolean | null;
   infusionDetails?: string;
+  
+  // Final question
+  wantsNutritionCounseling: boolean | null;
 }
+
+export type MalnutritionLevel = 'none' | 'mild' | 'severe';
 
 export interface ScreeningResult {
   patientCode: string;
   answers: ScreeningAnswers;
   scores: {
-    bmi: number;
-    bmiScore: number;
+    bmi: number; // Nur anzeigen, nicht im Score
     weightLossScore: number;
-    nutritionScore: number;
+    nutritionScore: number; // Mahlzeiten x Portionsgröße
     diseaseScore: number;
-    ageBonus: number;
+    physicalConditionScore: number;
+    swallowingScore: number;
   };
   totalScore: number;
+  malnutritionLevel: MalnutritionLevel;
   isAtRisk: boolean;
   recommendations?: {
     energy: number;
@@ -100,6 +117,7 @@ export type WizardStep =
   | 'gender'
   | 'height'
   | 'weight'
+  | 'normalWeight'
   | 'weightLoss'
   | 'weightLossAmount'
   | 'clothingLoose'
@@ -111,7 +129,8 @@ export type WizardStep =
   | 'sweetPreference'
   | 'meatPerWeek'
   | 'carbsPerWeek'
-  | 'currentDiseases'
+  | 'acuteDiseases'
+  | 'chronicDiseases'
   | 'physicalCondition'
   | 'mobility'
   | 'drinkingAmount'
@@ -120,6 +139,7 @@ export type WizardStep =
   | 'supplements'
   | 'nutritionTherapy'
   | 'infusions'
+  | 'nutritionCounseling'
   | 'result';
 
 export const initialAnswers: ScreeningAnswers = {
@@ -127,6 +147,7 @@ export const initialAnswers: ScreeningAnswers = {
   gender: null,
   height: 165,
   weight: 70,
+  normalWeight: null,
   weightUnknown: false,
   hasWeightLoss: null,
   weightLossAmount: null,
@@ -139,17 +160,23 @@ export const initialAnswers: ScreeningAnswers = {
   sweetPreference: null,
   meatPerWeek: null,
   carbsPerWeek: null,
-  currentDiseases: {
+  acuteDiseases: {
     cancer: null,
-    pneumonia: null,
+    acuteInfection: null,
+  },
+  chronicDiseases: {
     heartFailure: null,
+    rheumatism: null,
+    lungDisease: null,
+    kidneyDisease: null,
     stroke: null,
-    digestiveIssues: null,
+    diarrhea: null,
+    nauseaVomiting: null,
+    gastrointestinalSurgery: null,
   },
   feelsWeaker: null,
   muscleLoss: null,
   frequentInfections: null,
-  getsOutdoors: null,
   difficultyGettingUp: null,
   shortnessOfBreath: null,
   mobilityLevel: null,
@@ -159,4 +186,5 @@ export const initialAnswers: ScreeningAnswers = {
   hasSupplementExperience: null,
   hadNutritionTherapy: null,
   hadNutrientInfusions: null,
+  wantsNutritionCounseling: null,
 };

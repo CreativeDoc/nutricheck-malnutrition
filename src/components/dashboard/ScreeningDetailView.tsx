@@ -72,6 +72,15 @@ const formatWeightLoss = (amount: string | null) => {
   }
 };
 
+const formatMalnutritionLevel = (level: string) => {
+  switch (level) {
+    case 'none': return 'Kein Mangelernährungszustand';
+    case 'mild': return 'Leichter Mangelernährungszustand';
+    case 'severe': return 'Schwerer Mangelernährungszustand';
+    default: return '-';
+  }
+};
+
 export function ScreeningDetailView({ screening, onBack }: ScreeningDetailViewProps) {
   const { answers } = screening;
 
@@ -80,6 +89,7 @@ export function ScreeningDetailView({ screening, onBack }: ScreeningDetailViewPr
     { label: 'Geschlecht', value: formatGender(answers.gender) },
     { label: 'Größe', value: answers.height ? `${answers.height} cm` : '-' },
     { label: 'Gewicht', value: answers.weightUnknown ? 'Unbekannt' : answers.weight ? `${answers.weight} kg` : '-' },
+    { label: 'Normalgewicht', value: answers.normalWeight ? `${answers.normalWeight} kg` : '-' },
     { label: 'Gewichtsverlust', value: formatBoolean(answers.hasWeightLoss) },
     { label: 'Gewichtsverlust Menge', value: formatWeightLoss(answers.weightLossAmount) },
     { label: 'Kleidung weiter geworden', value: formatBoolean(answers.clothingLoose) },
@@ -89,34 +99,40 @@ export function ScreeningDetailView({ screening, onBack }: ScreeningDetailViewPr
     { label: 'Portionsgröße', value: formatPortion(answers.portionSize) },
     { label: 'Appetit (Fremdeinschätzung)', value: answers.appetiteByOthers === 'normal' ? 'Normal' : answers.appetiteByOthers === 'limited' ? 'Eingeschränkt' : '-' },
     
-    // Ernährung
+    // Ernährung (Indikatoren)
     { label: 'Obst pro Woche', value: formatFrequency(answers.fruitPerWeek) },
     { label: 'Gemüse pro Woche', value: formatFrequency(answers.vegetablesPerWeek) },
     { label: 'Süßigkeiten', value: answers.sweetPreference === 'like' ? 'Gern' : answers.sweetPreference === 'dislike' ? 'Nicht so gern' : '-' },
     { label: 'Fleisch/Wurst pro Woche', value: formatFrequency(answers.meatPerWeek) },
     { label: 'Kohlenhydrate pro Woche', value: formatFrequency(answers.carbsPerWeek) },
     
-    // Erkrankungen
-    { label: 'Krebs', value: formatBoolean(answers.currentDiseases.cancer) },
-    ...(answers.currentDiseases.cancer && answers.currentDiseases.cancerType 
-      ? [{ label: 'Krebsart', value: answers.currentDiseases.cancerType }] 
+    // Aktuelle Erkrankungen
+    { label: 'Krebs', value: formatBoolean(answers.acuteDiseases.cancer) },
+    ...(answers.acuteDiseases.cancer && answers.acuteDiseases.cancerType 
+      ? [{ label: 'Krebsart', value: answers.acuteDiseases.cancerType }] 
       : []),
-    { label: 'Lungenentzündung', value: formatBoolean(answers.currentDiseases.pneumonia) },
-    { label: 'Schwere Herzinsuffizienz', value: formatBoolean(answers.currentDiseases.heartFailure) },
-    { label: 'Schlaganfall', value: formatBoolean(answers.currentDiseases.stroke) },
-    { label: 'Verdauungsprobleme', value: formatBoolean(answers.currentDiseases.digestiveIssues) },
-    ...(answers.currentDiseases.digestiveIssues && answers.currentDiseases.digestiveDetails 
-      ? [{ label: 'Verdauungsprobleme Details', value: answers.currentDiseases.digestiveDetails }] 
+    { label: 'Akute Infektion', value: formatBoolean(answers.acuteDiseases.acuteInfection) },
+    ...(answers.acuteDiseases.acuteInfection && answers.acuteDiseases.acuteInfectionDetails 
+      ? [{ label: 'Infektion Details', value: answers.acuteDiseases.acuteInfectionDetails }] 
       : []),
-    ...(answers.currentDiseases.otherDiseases 
-      ? [{ label: 'Andere Erkrankungen', value: answers.currentDiseases.otherDiseases }] 
+    
+    // Chronische Erkrankungen
+    { label: 'Herzschwäche', value: formatBoolean(answers.chronicDiseases.heartFailure) },
+    { label: 'Rheuma', value: formatBoolean(answers.chronicDiseases.rheumatism) },
+    { label: 'Chronische Lungenerkrankung', value: formatBoolean(answers.chronicDiseases.lungDisease) },
+    { label: 'Nierenerkrankung', value: formatBoolean(answers.chronicDiseases.kidneyDisease) },
+    { label: 'Schlaganfall', value: formatBoolean(answers.chronicDiseases.stroke) },
+    { label: 'Durchfälle', value: formatBoolean(answers.chronicDiseases.diarrhea) },
+    { label: 'Übelkeit/Erbrechen', value: formatBoolean(answers.chronicDiseases.nauseaVomiting) },
+    { label: 'Zustand nach Magen-/Darm-OP', value: formatBoolean(answers.chronicDiseases.gastrointestinalSurgery) },
+    ...(answers.chronicDiseases.otherDiseases 
+      ? [{ label: 'Andere Erkrankungen', value: answers.chronicDiseases.otherDiseases }] 
       : []),
     
     // Körperliches Befinden
     { label: 'Fühlt sich schwächer', value: formatBoolean(answers.feelsWeaker) },
     { label: 'Muskelabbau', value: formatBoolean(answers.muscleLoss) },
     { label: 'Häufige Infektionen', value: formatBoolean(answers.frequentInfections) },
-    { label: 'Häufig an frischer Luft', value: formatBoolean(answers.getsOutdoors) },
     { label: 'Schwerer aufzustehen', value: formatBoolean(answers.difficultyGettingUp) },
     { label: 'Kurzatmiger geworden', value: formatBoolean(answers.shortnessOfBreath) },
     
@@ -144,6 +160,9 @@ export function ScreeningDetailView({ screening, onBack }: ScreeningDetailViewPr
     ...(answers.hadNutrientInfusions && answers.infusionDetails 
       ? [{ label: 'Infusionen Details', value: answers.infusionDetails }] 
       : []),
+    
+    // Abschlussfrage
+    { label: 'Wünscht Ernährungsberatung', value: formatBoolean(answers.wantsNutritionCounseling) },
   ];
 
   return (
@@ -170,12 +189,12 @@ export function ScreeningDetailView({ screening, onBack }: ScreeningDetailViewPr
           ) : (
             <CheckCircle2 className="w-4 h-4" />
           )}
-          {screening.isAtRisk ? 'Risiko erkannt' : 'Kein Risiko'}
+          {formatMalnutritionLevel(screening.malnutritionLevel)}
         </div>
       </div>
 
       {/* Score Summary */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <div className="p-3 rounded-lg bg-muted/50 text-center">
           <p className="text-2xl font-bold text-primary">{screening.totalScore}</p>
           <p className="text-xs text-muted-foreground">Gesamtscore</p>
@@ -183,6 +202,10 @@ export function ScreeningDetailView({ screening, onBack }: ScreeningDetailViewPr
         <div className="p-3 rounded-lg bg-muted/50 text-center">
           <p className="text-2xl font-bold">{screening.scores.bmi.toFixed(1)}</p>
           <p className="text-xs text-muted-foreground">BMI</p>
+        </div>
+        <div className="p-3 rounded-lg bg-muted/50 text-center">
+          <p className="text-2xl font-bold">{screening.scores.weightLossScore}</p>
+          <p className="text-xs text-muted-foreground">Gewichtsverlust</p>
         </div>
         <div className="p-3 rounded-lg bg-muted/50 text-center">
           <p className="text-2xl font-bold">{screening.scores.nutritionScore}</p>

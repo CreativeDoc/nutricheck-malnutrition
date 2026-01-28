@@ -10,7 +10,7 @@ import { GenderSelector } from './GenderSelector';
 import { FrequencySelector } from './FrequencySelector';
 import { MealsPerDaySelector } from './MealsPerDaySelector';
 import { DrinkingAmountSelector } from './DrinkingAmountSelector';
-import { DiseaseSelector } from './DiseaseSelector';
+import { AcuteDiseaseSelector, ChronicDiseaseSelector } from './DiseaseSelector';
 import { PhysicalConditionQuestions } from './PhysicalConditionQuestions';
 import { ResultScreen } from './ResultScreen';
 import { Button } from '@/components/ui/button';
@@ -47,15 +47,15 @@ export function ScreeningWizard({
     setAnswers(prev => ({ ...prev, [key]: value }));
   };
 
-  const totalSteps = 20;
+  const totalSteps = 23; // Updated for new steps
 
   const getStepNumber = (): number => {
     const stepOrder: WizardStep[] = [
-      'gender', 'height', 'weight', 'weightLoss',
+      'gender', 'height', 'weight', 'normalWeight', 'weightLoss',
       'mealsPerDay', 'portionSize', 'appetiteByOthers',
       'fruitPerWeek', 'vegetablesPerWeek', 'sweetPreference', 'meatPerWeek', 'carbsPerWeek',
-      'currentDiseases', 'physicalCondition', 'drinkingAmount', 'swallowing',
-      'medication', 'supplements', 'nutritionTherapy', 'infusions'
+      'acuteDiseases', 'chronicDiseases', 'physicalCondition', 'drinkingAmount', 'swallowing',
+      'medication', 'supplements', 'nutritionTherapy', 'infusions', 'nutritionCounseling'
     ];
     const index = stepOrder.indexOf(currentStep);
     return index >= 0 ? index + 1 : 1;
@@ -80,7 +80,6 @@ export function ScreeningWizard({
     answers.feelsWeaker !== null &&
     answers.muscleLoss !== null &&
     answers.frequentInfections !== null &&
-    answers.getsOutdoors !== null &&
     answers.difficultyGettingUp !== null &&
     answers.shortnessOfBreath !== null;
 
@@ -142,12 +141,12 @@ export function ScreeningWizard({
         <QuestionLayout
           step={3}
           totalSteps={totalSteps}
-          title="Wie viel wiegen Sie?"
+          title="Wie viel wiegen Sie aktuell?"
           subtitle="Schätzen Sie, wenn Sie unsicher sind"
           canGoBack={true}
           canGoNext={true}
           onBack={() => goBack('height')}
-          onNext={() => goNext('weightLoss')}
+          onNext={() => goNext('normalWeight')}
         >
           <div className="space-y-6">
             <NumberPicker
@@ -160,7 +159,7 @@ export function ScreeningWizard({
               max={200}
               step={0.5}
               unit="kg"
-              label="Körpergewicht"
+              label="Aktuelles Körpergewicht"
             />
             <Button
               variant={answers.weightUnknown ? "default" : "outline"}
@@ -177,15 +176,39 @@ export function ScreeningWizard({
         </QuestionLayout>
       );
 
-    case 'weightLoss':
+    case 'normalWeight':
       return (
         <QuestionLayout
           step={4}
           totalSteps={totalSteps}
+          title="Wie ist Ihr Normalgewicht?"
+          subtitle="Das Gewicht, bei dem Sie sich normalerweise wohlfühlen"
+          canGoBack={true}
+          canGoNext={true}
+          onBack={() => goBack('weight')}
+          onNext={() => goNext('weightLoss')}
+        >
+          <NumberPicker
+            value={answers.normalWeight || answers.weight || 70}
+            onChange={(v) => updateAnswer('normalWeight', v)}
+            min={30}
+            max={200}
+            step={0.5}
+            unit="kg"
+            label="Normalgewicht"
+          />
+        </QuestionLayout>
+      );
+
+    case 'weightLoss':
+      return (
+        <QuestionLayout
+          step={5}
+          totalSteps={totalSteps}
           title="Haben Sie in den letzten 3 Monaten ungewollt abgenommen?"
           canGoBack={true}
           canGoNext={answers.hasWeightLoss !== null}
-          onBack={() => goBack('weight')}
+          onBack={() => goBack('normalWeight')}
           onNext={() => {
             if (answers.hasWeightLoss && !answers.weightUnknown) {
               goNext('weightLossAmount');
@@ -200,14 +223,12 @@ export function ScreeningWizard({
             <QuestionCard
               selected={answers.hasWeightLoss === true}
               onClick={() => updateAnswer('hasWeightLoss', true)}
-              variant="danger"
             >
               Ja
             </QuestionCard>
             <QuestionCard
               selected={answers.hasWeightLoss === false}
               onClick={() => updateAnswer('hasWeightLoss', false)}
-              variant="success"
             >
               Nein
             </QuestionCard>
@@ -218,7 +239,7 @@ export function ScreeningWizard({
     case 'weightLossAmount':
       return (
         <QuestionLayout
-          step={5}
+          step={6}
           totalSteps={totalSteps}
           title="Wie viel haben Sie abgenommen?"
           subtitle="In den letzten 3 Monaten"
@@ -246,7 +267,7 @@ export function ScreeningWizard({
     case 'clothingLoose':
       return (
         <QuestionLayout
-          step={5}
+          step={6}
           totalSteps={totalSteps}
           title="Ist Ihre Kleidung oder Ihr Schmuck in letzter Zeit weiter geworden?"
           subtitle="Dies hilft uns, Gewichtsverlust einzuschätzen"
@@ -259,14 +280,12 @@ export function ScreeningWizard({
             <QuestionCard
               selected={answers.clothingLoose === true}
               onClick={() => updateAnswer('clothingLoose', true)}
-              variant="danger"
             >
               Ja
             </QuestionCard>
             <QuestionCard
               selected={answers.clothingLoose === false}
               onClick={() => updateAnswer('clothingLoose', false)}
-              variant="success"
             >
               Nein
             </QuestionCard>
@@ -277,7 +296,7 @@ export function ScreeningWizard({
     case 'mealsPerDay':
       return (
         <QuestionLayout
-          step={6}
+          step={7}
           totalSteps={totalSteps}
           title="Wie viele Mahlzeiten nehmen Sie am Tag zu sich?"
           canGoBack={true}
@@ -303,7 +322,7 @@ export function ScreeningWizard({
     case 'portionSize':
       return (
         <QuestionLayout
-          step={7}
+          step={8}
           totalSteps={totalSteps}
           title="Wie groß sind Ihre aktuellen Portionen?"
           subtitle="Wählen Sie den passenden Teller"
@@ -322,7 +341,7 @@ export function ScreeningWizard({
     case 'appetiteByOthers':
       return (
         <QuestionLayout
-          step={8}
+          step={9}
           totalSteps={totalSteps}
           title="Wie beurteilen Angehörige oder Freunde Ihren Appetit?"
           canGoBack={true}
@@ -334,14 +353,12 @@ export function ScreeningWizard({
             <QuestionCard
               selected={answers.appetiteByOthers === 'normal'}
               onClick={() => updateAnswer('appetiteByOthers', 'normal')}
-              variant="success"
             >
               Normal
             </QuestionCard>
             <QuestionCard
               selected={answers.appetiteByOthers === 'limited'}
               onClick={() => updateAnswer('appetiteByOthers', 'limited')}
-              variant="danger"
             >
               Eingeschränkt
             </QuestionCard>
@@ -352,7 +369,7 @@ export function ScreeningWizard({
     case 'fruitPerWeek':
       return (
         <QuestionLayout
-          step={9}
+          step={10}
           totalSteps={totalSteps}
           title="Wie oft essen Sie Obst in der Woche?"
           canGoBack={true}
@@ -371,7 +388,7 @@ export function ScreeningWizard({
     case 'vegetablesPerWeek':
       return (
         <QuestionLayout
-          step={10}
+          step={11}
           totalSteps={totalSteps}
           title="Wie oft essen Sie Gemüse in der Woche?"
           canGoBack={true}
@@ -390,7 +407,7 @@ export function ScreeningWizard({
     case 'sweetPreference':
       return (
         <QuestionLayout
-          step={11}
+          step={12}
           totalSteps={totalSteps}
           title="Wie gern essen Sie Süßigkeiten?"
           canGoBack={true}
@@ -418,7 +435,7 @@ export function ScreeningWizard({
     case 'meatPerWeek':
       return (
         <QuestionLayout
-          step={12}
+          step={13}
           totalSteps={totalSteps}
           title="Wie oft essen Sie Fleisch oder Wurstwaren in der Woche?"
           canGoBack={true}
@@ -437,14 +454,14 @@ export function ScreeningWizard({
     case 'carbsPerWeek':
       return (
         <QuestionLayout
-          step={13}
+          step={14}
           totalSteps={totalSteps}
           title="Wie oft essen Sie Kohlenhydrate?"
           subtitle="Kartoffeln, Reis, Nudeln, Hülsenfrüchte"
           canGoBack={true}
           canGoNext={answers.carbsPerWeek !== null}
           onBack={() => goBack('meatPerWeek')}
-          onNext={() => goNext('currentDiseases')}
+          onNext={() => goNext('acuteDiseases')}
         >
           <FrequencySelector
             value={answers.carbsPerWeek}
@@ -454,20 +471,38 @@ export function ScreeningWizard({
         </QuestionLayout>
       );
 
-    case 'currentDiseases':
+    case 'acuteDiseases':
       return (
         <QuestionLayout
-          step={14}
+          step={15}
           totalSteps={totalSteps}
           title="Aktuelle Erkrankungen"
           canGoBack={true}
           canGoNext={true}
           onBack={() => goBack('carbsPerWeek')}
+          onNext={() => goNext('chronicDiseases')}
+        >
+          <AcuteDiseaseSelector
+            value={answers.acuteDiseases}
+            onChange={(v) => updateAnswer('acuteDiseases', v)}
+          />
+        </QuestionLayout>
+      );
+
+    case 'chronicDiseases':
+      return (
+        <QuestionLayout
+          step={16}
+          totalSteps={totalSteps}
+          title="Chronische Erkrankungen"
+          canGoBack={true}
+          canGoNext={true}
+          onBack={() => goBack('acuteDiseases')}
           onNext={() => goNext('physicalCondition')}
         >
-          <DiseaseSelector
-            value={answers.currentDiseases}
-            onChange={(v) => updateAnswer('currentDiseases', v)}
+          <ChronicDiseaseSelector
+            value={answers.chronicDiseases}
+            onChange={(v) => updateAnswer('chronicDiseases', v)}
           />
         </QuestionLayout>
       );
@@ -475,12 +510,12 @@ export function ScreeningWizard({
     case 'physicalCondition':
       return (
         <QuestionLayout
-          step={15}
+          step={17}
           totalSteps={totalSteps}
           title="Ihr körperliches Befinden"
           canGoBack={true}
           canGoNext={physicalConditionComplete}
-          onBack={() => goBack('currentDiseases')}
+          onBack={() => goBack('chronicDiseases')}
           onNext={() => goNext('drinkingAmount')}
         >
           <PhysicalConditionQuestions
@@ -493,7 +528,7 @@ export function ScreeningWizard({
     case 'drinkingAmount':
       return (
         <QuestionLayout
-          step={16}
+          step={18}
           totalSteps={totalSteps}
           title="Wie viel trinken Sie am Tag?"
           canGoBack={true}
@@ -511,7 +546,7 @@ export function ScreeningWizard({
     case 'swallowing':
       return (
         <QuestionLayout
-          step={17}
+          step={19}
           totalSteps={totalSteps}
           title="Haben Sie Schluckbeschwerden?"
           subtitle="z.B. bei Entzündungen, durch Strahlentherapie, nach Operationen"
@@ -525,14 +560,12 @@ export function ScreeningWizard({
               <QuestionCard
                 selected={answers.hasSwallowingIssues === true}
                 onClick={() => updateAnswer('hasSwallowingIssues', true)}
-                variant="danger"
               >
                 Ja
               </QuestionCard>
               <QuestionCard
                 selected={answers.hasSwallowingIssues === false}
                 onClick={() => updateAnswer('hasSwallowingIssues', false)}
-                variant="success"
               >
                 Nein
               </QuestionCard>
@@ -552,7 +585,7 @@ export function ScreeningWizard({
     case 'medication':
       return (
         <QuestionLayout
-          step={18}
+          step={20}
           totalSteps={totalSteps}
           title="Nehmen Sie regelmäßig Medikamente ein?"
           canGoBack={true}
@@ -590,19 +623,13 @@ export function ScreeningWizard({
     case 'supplements':
       return (
         <QuestionLayout
-          step={19}
+          step={21}
           totalSteps={totalSteps}
           title="Haben Sie Erfahrungen mit Nahrungsergänzungsmitteln?"
           canGoBack={true}
           canGoNext={answers.hasSupplementExperience !== null}
           onBack={() => goBack('medication')}
-          onNext={() => {
-            if (answers.hasSupplementExperience) {
-              goNext('nutritionTherapy');
-            } else {
-              goNext('nutritionTherapy');
-            }
-          }}
+          onNext={() => goNext('nutritionTherapy')}
         >
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -634,7 +661,7 @@ export function ScreeningWizard({
     case 'nutritionTherapy':
       return (
         <QuestionLayout
-          step={20}
+          step={22}
           totalSteps={totalSteps}
           title="Hatten Sie schon mal eine Ernährungstherapie?"
           subtitle="z.B. verschreibungspflichtige Produkte wie Fresubin"
@@ -673,14 +700,13 @@ export function ScreeningWizard({
     case 'infusions':
       return (
         <QuestionLayout
-          step={21}
+          step={23}
           totalSteps={totalSteps}
           title="Hatten Sie schon mal Infusionen mit Nährstoffen erhalten?"
           canGoBack={true}
           canGoNext={answers.hadNutrientInfusions !== null}
-          isLastStep={true}
           onBack={() => goBack('nutritionTherapy')}
-          onNext={finishScreening}
+          onNext={() => goNext('nutritionCounseling')}
         >
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -705,6 +731,35 @@ export function ScreeningWizard({
                 className="text-senior-base min-h-[100px]"
               />
             )}
+          </div>
+        </QuestionLayout>
+      );
+
+    case 'nutritionCounseling':
+      return (
+        <QuestionLayout
+          step={24}
+          totalSteps={totalSteps}
+          title="Wünschen Sie eine Ernährungsberatung / Ernährungstherapie?"
+          canGoBack={true}
+          canGoNext={answers.wantsNutritionCounseling !== null}
+          isLastStep={true}
+          onBack={() => goBack('infusions')}
+          onNext={finishScreening}
+        >
+          <div className="grid grid-cols-2 gap-4">
+            <QuestionCard
+              selected={answers.wantsNutritionCounseling === true}
+              onClick={() => updateAnswer('wantsNutritionCounseling', true)}
+            >
+              Ja
+            </QuestionCard>
+            <QuestionCard
+              selected={answers.wantsNutritionCounseling === false}
+              onClick={() => updateAnswer('wantsNutritionCounseling', false)}
+            >
+              Nein
+            </QuestionCard>
           </div>
         </QuestionLayout>
       );

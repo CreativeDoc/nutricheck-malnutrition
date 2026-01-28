@@ -5,7 +5,7 @@ import { Check, X } from 'lucide-react';
 interface PhysicalConditionQuestionsProps {
   answers: Pick<ScreeningAnswers, 
     'feelsWeaker' | 'muscleLoss' | 'frequentInfections' | 
-    'getsOutdoors' | 'difficultyGettingUp' | 'shortnessOfBreath'
+    'difficultyGettingUp' | 'shortnessOfBreath'
   >;
   onChange: <K extends keyof ScreeningAnswers>(key: K, value: ScreeningAnswers[K]) => void;
 }
@@ -14,7 +14,6 @@ const questions = [
   { key: 'feelsWeaker' as const, label: 'Fühlen Sie sich schwächer als früher?' },
   { key: 'muscleLoss' as const, label: 'Haben Sie Muskeln abgebaut?' },
   { key: 'frequentInfections' as const, label: 'Leiden Sie häufiger an Infektionen?' },
-  { key: 'getsOutdoors' as const, label: 'Sind Sie häufig an der frischen Luft?', inverted: true },
   { key: 'difficultyGettingUp' as const, label: 'Fällt es Ihnen schwerer aufzustehen und etwas zu unternehmen?' },
   { key: 'shortnessOfBreath' as const, label: 'Sind Sie kurzatmiger geworden, besonders bei Anstrengungen?' },
 ];
