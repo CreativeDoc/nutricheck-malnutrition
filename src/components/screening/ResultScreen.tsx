@@ -10,7 +10,8 @@ import {
   Check,
   Home,
   Utensils,
-  Flame
+  Flame,
+  MessageCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
@@ -19,11 +20,14 @@ interface ResultScreenProps {
   result: ScreeningResult;
   onNewScreening: () => void;
   onBackToDashboard: () => void;
+  onUpdateCounselingChoice?: (wantsCounseling: boolean) => void;
 }
 
-export function ResultScreen({ result, onNewScreening, onBackToDashboard }: ResultScreenProps) {
-  const [showTherapy, setShowTherapy] = useState(false);
+export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpdateCounselingChoice }: ResultScreenProps) {
   const [copied, setCopied] = useState(false);
+  const [counselingChoice, setCounselingChoice] = useState<boolean | null>(
+    result.answers.wantsNutritionCounseling
+  );
 
   const copyReport = async () => {
     const reportText = generateReportText(result);
@@ -34,6 +38,11 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard }: Resu
       description: "Der Bericht wurde in die Zwischenablage kopiert.",
     });
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleCounselingChoice = (choice: boolean) => {
+    setCounselingChoice(choice);
+    onUpdateCounselingChoice?.(choice);
   };
 
   const getLevelStyles = () => {
@@ -116,21 +125,57 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard }: Resu
           </p>
         </div>
 
-        {/* At Risk Actions */}
-        {result.isAtRisk && !showTherapy && (
+        {/* Counseling Question */}
+        {result.isAtRisk && (
           <div className="space-y-4 mb-8 animate-scale-in">
-            <Button
-              onClick={() => setShowTherapy(true)}
-              className="btn-xxl w-full bg-primary hover:bg-primary/90 gap-4"
-            >
-              <Utensils className="w-7 h-7" />
-              Ernährungstherapie anzeigen
-            </Button>
+            <div className="bg-card border-2 border-border rounded-2xl p-6">
+              <div className="flex items-start gap-4 mb-6">
+                <div className="bg-primary/10 p-3 rounded-full">
+                  <MessageCircle className="w-8 h-8 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-senior-lg font-semibold text-foreground mb-2">
+                    Möchten Sie eine Beratung hinsichtlich einer für Sie geeigneten Ernährungstherapie?
+                  </h2>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <Button
+                  onClick={() => handleCounselingChoice(true)}
+                  variant={counselingChoice === true ? "default" : "outline"}
+                  className={cn(
+                    "btn-xl flex-1",
+                    counselingChoice === true && "bg-primary hover:bg-primary/90"
+                  )}
+                >
+                  Ja
+                </Button>
+                <Button
+                  onClick={() => handleCounselingChoice(false)}
+                  variant={counselingChoice === false ? "default" : "outline"}
+                  className={cn(
+                    "btn-xl flex-1",
+                    counselingChoice === false && "bg-muted-foreground hover:bg-muted-foreground/90"
+                  )}
+                >
+                  Nein
+                </Button>
+              </div>
+
+              {counselingChoice === true && (
+                <div className="mt-6 p-4 bg-primary/10 rounded-xl border border-primary/20 animate-scale-in">
+                  <p className="text-senior text-foreground">
+                    <strong>Vielen Dank!</strong> Ein spezialisierter Ernährungsmediziner wird sich mit der Praxis in Verbindung setzen, um die weiteren Schritte mit Ihnen zu besprechen.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
-        {/* Therapy Recommendations */}
-        {showTherapy && result.recommendations && (
+        {/* Therapy Recommendations - always shown for at-risk patients */}
+        {result.isAtRisk && result.recommendations && (
           <div className="space-y-6 mb-8 animate-scale-in">
             <h2 className="text-senior-xl font-bold text-foreground text-center">
               Therapie-Empfehlung
@@ -176,23 +221,23 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard }: Resu
           </div>
         )}
 
-        {/* Counseling Request */}
-        {result.answers.wantsNutritionCounseling && (
-          <div className="bg-primary/10 border-2 border-primary rounded-2xl p-6 mb-8 text-center">
-            <p className="text-senior-lg font-medium text-primary">
-              ✓ Patient wünscht Ernährungsberatung / Ernährungstherapie
-            </p>
-          </div>
-        )}
-
         {/* Score Breakdown */}
         <div className="bg-card border border-border rounded-2xl p-6 mb-8">
           <h3 className="text-senior-lg font-semibold text-foreground mb-4">
             Score-Aufschlüsselung
           </h3>
           <div className="space-y-3">
+            {/* BMI - larger display */}
+            <div className="flex justify-between items-center bg-muted/30 rounded-xl p-4 mb-2">
+              <span className="text-senior-lg font-medium text-foreground">
+                BMI
+              </span>
+              <span className="text-senior-xl font-bold text-primary">
+                {result.scores.bmi.toFixed(1)}
+              </span>
+            </div>
+
             {[
-              { label: 'BMI', value: null, detail: `${result.scores.bmi.toFixed(1)} (nicht im Score)` },
               { label: 'Gewichtsverlust', value: result.scores.weightLossScore },
               { label: 'Nahrungszufuhr', value: result.scores.nutritionScore },
               { label: 'Erkrankungen', value: result.scores.diseaseScore },
@@ -202,18 +247,13 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard }: Resu
               <div key={item.label} className="flex justify-between items-center">
                 <span className="text-senior text-muted-foreground">
                   {item.label}
-                  {item.detail && (
-                    <span className="text-sm ml-2">({item.detail})</span>
-                  )}
                 </span>
-                {item.value !== null && (
-                  <span className={cn(
-                    "text-senior font-semibold px-3 py-1 rounded-full",
-                    item.value > 0 ? "bg-warning/20 text-warning" : "bg-muted text-muted-foreground"
-                  )}>
-                    {item.value}
-                  </span>
-                )}
+                <span className={cn(
+                  "text-senior font-semibold px-3 py-1 rounded-full",
+                  item.value > 0 ? "bg-warning/20 text-warning" : "bg-muted text-muted-foreground"
+                )}>
+                  {item.value}
+                </span>
               </div>
             ))}
             <div className="border-t border-border pt-3 mt-3 flex justify-between items-center">
