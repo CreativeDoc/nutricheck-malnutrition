@@ -3,11 +3,12 @@ import { Header } from '@/components/dashboard/Header';
 import { PatientForm } from '@/components/dashboard/PatientForm';
 import { SettingsView } from '@/components/dashboard/SettingsView';
 import { RecentScreenings } from '@/components/dashboard/RecentScreenings';
+import { LanguageSelector } from '@/components/dashboard/LanguageSelector';
 import { ScreeningIntro } from '@/components/dashboard/ScreeningIntro';
 import { ScreeningWizard } from '@/components/screening/ScreeningWizard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Patient, ScreeningResult } from '@/types/screening';
+import { Patient, PatientLanguage, ScreeningResult } from '@/types/screening';
 import { UserPlus, Activity, ArrowLeft, ClipboardList } from 'lucide-react';
 
 interface DashboardProps {
@@ -22,8 +23,10 @@ interface PracticeData {
 type DashboardView = 'home' | 'settings' | 'screenings';
 
 export function Dashboard({ onLogout }: DashboardProps) {
+  const [showLanguageSelector, setShowLanguageSelector] = useState(false);
   const [showIntro, setShowIntro] = useState(false);
   const [showPatientForm, setShowPatientForm] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState<PatientLanguage>('de');
   const [currentView, setCurrentView] = useState<DashboardView>('home');
   const [activePatient, setActivePatient] = useState<Patient | null>(null);
   const [screenings, setScreenings] = useState<ScreeningResult[]>([]);
@@ -33,6 +36,12 @@ export function Dashboard({ onLogout }: DashboardProps) {
   });
 
   const handleStartScreening = () => {
+    setShowLanguageSelector(true);
+  };
+
+  const handleLanguageSelect = (language: PatientLanguage) => {
+    setSelectedLanguage(language);
+    setShowLanguageSelector(false);
     setShowIntro(true);
   };
 
@@ -162,6 +171,12 @@ export function Dashboard({ onLogout }: DashboardProps) {
         )}
       </main>
 
+      <LanguageSelector
+        open={showLanguageSelector}
+        onOpenChange={setShowLanguageSelector}
+        onSelect={handleLanguageSelect}
+      />
+
       <ScreeningIntro
         open={showIntro}
         onOpenChange={setShowIntro}
@@ -172,6 +187,7 @@ export function Dashboard({ onLogout }: DashboardProps) {
         open={showPatientForm}
         onOpenChange={setShowPatientForm}
         onSubmit={handlePatientSubmit}
+        selectedLanguage={selectedLanguage}
       />
     </div>
   );
