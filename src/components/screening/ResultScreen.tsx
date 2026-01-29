@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ScreeningResult } from '@/types/screening';
 import { generateReportText } from '@/lib/nrsCalculator';
+import { useTranslation } from '@/hooks/useTranslation';
 import { 
   CheckCircle2, 
   AlertTriangle, 
@@ -24,6 +25,7 @@ interface ResultScreenProps {
 }
 
 export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpdateCounselingChoice }: ResultScreenProps) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
   const [counselingChoice, setCounselingChoice] = useState<boolean | null>(
     result.answers.wantsNutritionCounseling
@@ -34,8 +36,8 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
     await navigator.clipboard.writeText(reportText);
     setCopied(true);
     toast({
-      title: "Kopiert!",
-      description: "Der Bericht wurde in die Zwischenablage kopiert.",
+      title: t.copied,
+      description: t.copied,
     });
     setTimeout(() => setCopied(false), 2000);
   };
@@ -74,19 +76,19 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
   const getLevelTitle = () => {
     switch (result.malnutritionLevel) {
       case 'severe':
-        return 'Schwerer Mangelernährungszustand';
+        return t.severeMalnutrition;
       case 'mild':
-        return 'Leichter Mangelernährungszustand';
+        return t.mildMalnutrition;
       default:
-        return 'Kein Mangelernährungszustand';
+        return t.noMalnutrition;
     }
   };
 
   const getLevelDescription = () => {
     if (result.malnutritionLevel === 'none') {
-      return 'Es besteht kein erhöhtes Risiko für Mangelernährung.';
+      return t.noMalnutritionExplanation;
     }
-    return 'Bei Ihnen besteht ein Mangelernährungszustand, der therapiert werden kann und sollte.';
+    return t.malnutritionExplanation;
   };
 
   const styles = getLevelStyles();
@@ -119,9 +121,9 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
           </p>
 
           <p className="text-senior text-muted-foreground">
-            Score: <strong>{result.totalScore}</strong> Punkte
-            {result.malnutritionLevel === 'mild' && " (≥3 = leicht)"}
-            {result.malnutritionLevel === 'severe' && " (≥5 = schwer)"}
+            {t.scoreLabel} <strong>{result.totalScore}</strong> {t.totalScore === 'Gesamt' ? 'Punkte' : 'points'}
+            {result.malnutritionLevel === 'mild' && ` ${t.scoreMild}`}
+            {result.malnutritionLevel === 'severe' && ` ${t.scoreSevere}`}
           </p>
         </div>
 
@@ -135,7 +137,7 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
                 </div>
                 <div className="flex-1">
                   <h2 className="text-senior-lg font-semibold text-foreground mb-2">
-                    Möchten Sie eine Beratung hinsichtlich einer für Sie geeigneten Ernährungstherapie?
+                    {t.counselingQuestion}
                   </h2>
                 </div>
               </div>
@@ -149,7 +151,7 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
                     counselingChoice === true && "bg-primary hover:bg-primary/90"
                   )}
                 >
-                  Ja
+                  {t.yes}
                 </Button>
                 <Button
                   onClick={() => handleCounselingChoice(false)}
@@ -159,14 +161,14 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
                     counselingChoice === false && "bg-muted-foreground hover:bg-muted-foreground/90"
                   )}
                 >
-                  Nein
+                  {t.no}
                 </Button>
               </div>
 
               {counselingChoice === true && (
                 <div className="mt-6 p-4 bg-primary/10 rounded-xl border border-primary/20 animate-scale-in">
                   <p className="text-senior text-foreground">
-                    <strong>Vielen Dank!</strong> Ein spezialisierter Ernährungsmediziner wird sich mit der Praxis in Verbindung setzen, um die weiteren Schritte mit Ihnen zu besprechen.
+                    <strong>{t.counselingThankYou.split('!')[0]}!</strong> {t.counselingThankYou.split('!')[1]}
                   </p>
                 </div>
               )}
@@ -178,26 +180,26 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
         {result.isAtRisk && result.recommendations && (
           <div className="space-y-6 mb-8 animate-scale-in">
             <h2 className="text-senior-xl font-bold text-foreground text-center">
-              Therapie-Empfehlung
+              {t.therapyRecommendation}
             </h2>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-card border-2 border-border rounded-2xl p-6 text-center">
                 <Flame className="w-10 h-10 mx-auto mb-3 text-warning" />
-                <p className="text-senior text-muted-foreground mb-1">Energie</p>
+                <p className="text-senior text-muted-foreground mb-1">{t.energy}</p>
                 <p className="text-senior-2xl font-bold text-foreground">
                   {result.recommendations.energy}
                 </p>
-                <p className="text-senior text-muted-foreground">kcal/Tag</p>
+                <p className="text-senior text-muted-foreground">kcal{t.perDay}</p>
               </div>
 
               <div className="bg-card border-2 border-border rounded-2xl p-6 text-center">
                 <Utensils className="w-10 h-10 mx-auto mb-3 text-primary" />
-                <p className="text-senior text-muted-foreground mb-1">Protein</p>
+                <p className="text-senior text-muted-foreground mb-1">{t.protein}</p>
                 <p className="text-senior-2xl font-bold text-foreground">
                   {result.recommendations.protein}
                 </p>
-                <p className="text-senior text-muted-foreground">g/Tag</p>
+                <p className="text-senior text-muted-foreground">g{t.perDay}</p>
               </div>
             </div>
 
@@ -209,12 +211,12 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
               {copied ? (
                 <>
                   <Check className="w-6 h-6" />
-                  Kopiert!
+                  {t.copied}
                 </>
               ) : (
                 <>
                   <Copy className="w-6 h-6" />
-                  Bericht kopieren
+                  {t.copyReport}
                 </>
               )}
             </Button>
@@ -224,13 +226,13 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
         {/* Score Breakdown */}
         <div className="bg-card border border-border rounded-2xl p-6 mb-8">
           <h3 className="text-senior-lg font-semibold text-foreground mb-4">
-            Score-Aufschlüsselung
+            {t.scoreBreakdown}
           </h3>
           <div className="space-y-3">
             {/* BMI - larger display */}
             <div className="flex justify-between items-center bg-muted/30 rounded-xl p-4 mb-2">
               <span className="text-senior-lg font-medium text-foreground">
-                BMI
+                {t.bmiLabel}
               </span>
               <span className="text-senior-xl font-bold text-primary">
                 {result.scores.bmi.toFixed(1)}
@@ -238,11 +240,11 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
             </div>
 
             {[
-              { label: 'Gewichtsverlust', value: result.scores.weightLossScore },
-              { label: 'Nahrungszufuhr', value: result.scores.nutritionScore },
-              { label: 'Erkrankungen', value: result.scores.diseaseScore },
-              { label: 'Körperliches Befinden', value: result.scores.physicalConditionScore },
-              { label: 'Schluckbeschwerden', value: result.scores.swallowingScore },
+              { label: t.weightLossScore, value: result.scores.weightLossScore },
+              { label: t.nutritionScore, value: result.scores.nutritionScore },
+              { label: t.diseaseScore, value: result.scores.diseaseScore },
+              { label: t.physicalConditionScore, value: result.scores.physicalConditionScore },
+              { label: t.swallowingScore, value: result.scores.swallowingScore },
             ].map((item) => (
               <div key={item.label} className="flex justify-between items-center">
                 <span className="text-senior text-muted-foreground">
@@ -257,7 +259,7 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
               </div>
             ))}
             <div className="border-t border-border pt-3 mt-3 flex justify-between items-center">
-              <span className="text-senior-lg font-bold text-foreground">Gesamt</span>
+              <span className="text-senior-lg font-bold text-foreground">{t.totalScore}</span>
               <span className={cn(
                 "text-senior-lg font-bold px-4 py-1 rounded-full",
                 result.malnutritionLevel === 'severe' 
@@ -280,13 +282,13 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
             className="btn-xl flex-1 gap-3"
           >
             <Home className="w-6 h-6" />
-            Dashboard
+            {t.dashboard}
           </Button>
           <Button
             onClick={onNewScreening}
             className="btn-xl flex-1 gap-3"
           >
-            Neues Screening
+            {t.newScreening}
           </Button>
         </div>
       </main>

@@ -1,5 +1,6 @@
 import { FrequencyPerWeek } from '@/types/screening';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface FrequencySelectorProps {
   value: FrequencyPerWeek | null;
@@ -7,15 +8,17 @@ interface FrequencySelectorProps {
   label: string;
 }
 
-const frequencyOptions: { value: FrequencyPerWeek; label: string }[] = [
-  { value: '0', label: 'Nie / Selten' },
-  { value: '1-2', label: '1-2 mal' },
-  { value: '3-4', label: '3-4 mal' },
-  { value: '5-7', label: '5-7 mal' },
-  { value: 'daily', label: 'Täglich' },
-];
-
 export function FrequencySelector({ value, onChange, label }: FrequencySelectorProps) {
+  const { t } = useTranslation();
+
+  const frequencyOptions: { value: FrequencyPerWeek; label: string }[] = [
+    { value: '0', label: t.frequencyNever },
+    { value: '1-2', label: t.frequency1to2 },
+    { value: '3-4', label: t.frequency3to4 },
+    { value: '5-7', label: t.frequency5to7 },
+    { value: 'daily', label: t.frequencyDaily },
+  ];
+
   return (
     <div className="space-y-2">
       <p className="text-base text-muted-foreground text-center mb-3">{label}</p>

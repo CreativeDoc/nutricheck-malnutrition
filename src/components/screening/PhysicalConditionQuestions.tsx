@@ -1,6 +1,7 @@
 import { ScreeningAnswers } from '@/types/screening';
 import { cn } from '@/lib/utils';
 import { Check, X } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface PhysicalConditionQuestionsProps {
   answers: Pick<ScreeningAnswers, 
@@ -10,15 +11,17 @@ interface PhysicalConditionQuestionsProps {
   onChange: <K extends keyof ScreeningAnswers>(key: K, value: ScreeningAnswers[K]) => void;
 }
 
-const questions = [
-  { key: 'feelsWeaker' as const, label: 'Fühlen Sie sich schwächer als früher?' },
-  { key: 'muscleLoss' as const, label: 'Haben Sie Muskeln abgebaut?' },
-  { key: 'frequentInfections' as const, label: 'Leiden Sie häufiger an Infektionen?' },
-  { key: 'difficultyGettingUp' as const, label: 'Fällt es Ihnen schwerer aufzustehen und etwas zu unternehmen?' },
-  { key: 'shortnessOfBreath' as const, label: 'Sind Sie kurzatmiger geworden, besonders bei Anstrengungen?' },
-];
-
 export function PhysicalConditionQuestions({ answers, onChange }: PhysicalConditionQuestionsProps) {
+  const { t } = useTranslation();
+
+  const questions = [
+    { key: 'feelsWeaker' as const, label: t.feelsWeaker },
+    { key: 'muscleLoss' as const, label: t.muscleLoss },
+    { key: 'frequentInfections' as const, label: t.frequentInfections },
+    { key: 'difficultyGettingUp' as const, label: t.difficultyGettingUp },
+    { key: 'shortnessOfBreath' as const, label: t.shortnessOfBreath },
+  ];
+
   return (
     <div className="space-y-2">
       {questions.map((q) => (
@@ -35,7 +38,7 @@ export function PhysicalConditionQuestions({ answers, onChange }: PhysicalCondit
               )}
             >
               <Check className="w-4 h-4" />
-              <span className="text-sm font-medium">Ja</span>
+              <span className="text-sm font-medium">{t.yes}</span>
             </button>
             <button
               onClick={() => onChange(q.key, false)}
@@ -47,7 +50,7 @@ export function PhysicalConditionQuestions({ answers, onChange }: PhysicalCondit
               )}
             >
               <X className="w-4 h-4" />
-              <span className="text-sm font-medium">Nein</span>
+              <span className="text-sm font-medium">{t.no}</span>
             </button>
           </div>
         </div>

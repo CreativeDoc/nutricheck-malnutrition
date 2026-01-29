@@ -1,19 +1,22 @@
 import { cn } from '@/lib/utils';
 import { Check } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface PortionSelectorProps {
   value: 100 | 75 | 50 | 25 | null;
   onChange: (value: 100 | 75 | 50 | 25) => void;
 }
 
-const portions = [
-  { value: 100 as const, label: 'Voller Teller', description: 'Normale Menge' },
-  { value: 75 as const, label: '3/4 Teller', description: 'Etwas weniger' },
-  { value: 50 as const, label: 'Halber Teller', description: 'Die Hälfte' },
-  { value: 25 as const, label: '1/4 Teller', description: 'Sehr wenig' },
-];
-
 export function PortionSelector({ value, onChange }: PortionSelectorProps) {
+  const { t } = useTranslation();
+
+  const portions = [
+    { value: 100 as const, label: t.fullPlate, description: t.fullPlateDesc },
+    { value: 75 as const, label: t.threequarterPlate, description: t.threequarterPlateDesc },
+    { value: 50 as const, label: t.halfPlate, description: t.halfPlateDesc },
+    { value: 25 as const, label: t.quarterPlate, description: t.quarterPlateDesc },
+  ];
+
   return (
     <div className="grid grid-cols-2 gap-3">
       {portions.map((portion) => {

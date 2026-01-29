@@ -1,31 +1,34 @@
 import { Gender } from '@/types/screening';
 import { cn } from '@/lib/utils';
 import { User, Users } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface GenderSelectorProps {
   value: Gender | null;
   onChange: (value: Gender) => void;
 }
 
-const genderOptions: { value: Gender; label: string; icon: React.ReactNode }[] = [
-  { 
-    value: 'male', 
-    label: 'Männlich',
-    icon: <User className="w-12 h-12" />
-  },
-  { 
-    value: 'female', 
-    label: 'Weiblich',
-    icon: <User className="w-12 h-12" />
-  },
-  { 
-    value: 'diverse', 
-    label: 'Divers',
-    icon: <Users className="w-12 h-12" />
-  },
-];
-
 export function GenderSelector({ value, onChange }: GenderSelectorProps) {
+  const { t } = useTranslation();
+
+  const genderOptions: { value: Gender; label: string; icon: React.ReactNode }[] = [
+    { 
+      value: 'male', 
+      label: t.male,
+      icon: <User className="w-12 h-12" />
+    },
+    { 
+      value: 'female', 
+      label: t.female,
+      icon: <User className="w-12 h-12" />
+    },
+    { 
+      value: 'diverse', 
+      label: t.diverse,
+      icon: <Users className="w-12 h-12" />
+    },
+  ];
+
   return (
     <div className="flex flex-col gap-3">
       {genderOptions.map((option) => (

@@ -2,6 +2,7 @@ import { AcuteDiseases, ChronicDiseases } from '@/types/screening';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { Check, X } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface AcuteDiseaseSelectorProps {
   value: AcuteDiseases;
@@ -13,23 +14,14 @@ interface ChronicDiseaseSelectorProps {
   onChange: (value: ChronicDiseases) => void;
 }
 
-const acuteQuestions = [
-  { key: 'cancer' as const, label: 'Krebs', hasDetails: true, detailsKey: 'cancerType' as const, placeholder: 'Welche Art?' },
-  { key: 'acuteInfection' as const, label: 'Akute Infektion', hasDetails: true, detailsKey: 'acuteInfectionDetails' as const, placeholder: 'Welche Art?' },
-];
-
-const chronicQuestions = [
-  { key: 'heartFailure' as const, label: 'Herzschwäche (mit Wasser in den Beinen/Ödemen)' },
-  { key: 'rheumatism' as const, label: 'Rheuma' },
-  { key: 'lungDisease' as const, label: 'Chronische Lungenerkrankung' },
-  { key: 'kidneyDisease' as const, label: 'Nierenerkrankung' },
-  { key: 'stroke' as const, label: 'Schlaganfall' },
-  { key: 'diarrhea' as const, label: 'Durchfälle' },
-  { key: 'nauseaVomiting' as const, label: 'Übelkeit/Erbrechen' },
-  { key: 'gastrointestinalSurgery' as const, label: 'Zustand nach Magen-/Darm-Operation' },
-];
-
 export function AcuteDiseaseSelector({ value, onChange }: AcuteDiseaseSelectorProps) {
+  const { t } = useTranslation();
+
+  const acuteQuestions = [
+    { key: 'cancer' as const, label: t.cancer, hasDetails: true, detailsKey: 'cancerType' as const, placeholder: t.cancerTypePlaceholder },
+    { key: 'acuteInfection' as const, label: t.acuteInfection, hasDetails: true, detailsKey: 'acuteInfectionDetails' as const, placeholder: t.infectionTypePlaceholder },
+  ];
+
   const updateDisease = (key: keyof AcuteDiseases, newValue: boolean | string | null) => {
     onChange({ ...value, [key]: newValue });
   };
@@ -51,7 +43,7 @@ export function AcuteDiseaseSelector({ value, onChange }: AcuteDiseaseSelectorPr
                 )}
               >
                 <Check className="w-4 h-4" />
-                <span className="text-sm font-medium">Ja</span>
+                <span className="text-sm font-medium">{t.yes}</span>
               </button>
               <button
                 onClick={() => updateDisease(q.key, false)}
@@ -63,7 +55,7 @@ export function AcuteDiseaseSelector({ value, onChange }: AcuteDiseaseSelectorPr
                 )}
               >
                 <X className="w-4 h-4" />
-                <span className="text-sm font-medium">Nein</span>
+                <span className="text-sm font-medium">{t.no}</span>
               </button>
             </div>
           </div>
@@ -82,6 +74,19 @@ export function AcuteDiseaseSelector({ value, onChange }: AcuteDiseaseSelectorPr
 }
 
 export function ChronicDiseaseSelector({ value, onChange }: ChronicDiseaseSelectorProps) {
+  const { t } = useTranslation();
+
+  const chronicQuestions = [
+    { key: 'heartFailure' as const, label: t.heartFailure },
+    { key: 'rheumatism' as const, label: t.rheumatism },
+    { key: 'lungDisease' as const, label: t.lungDisease },
+    { key: 'kidneyDisease' as const, label: t.kidneyDisease },
+    { key: 'stroke' as const, label: t.stroke },
+    { key: 'diarrhea' as const, label: t.diarrhea },
+    { key: 'nauseaVomiting' as const, label: t.nauseaVomiting },
+    { key: 'gastrointestinalSurgery' as const, label: t.gastrointestinalSurgery },
+  ];
+
   const updateDisease = (key: keyof ChronicDiseases, newValue: boolean | string | null) => {
     onChange({ ...value, [key]: newValue });
   };
@@ -103,7 +108,7 @@ export function ChronicDiseaseSelector({ value, onChange }: ChronicDiseaseSelect
                 )}
               >
                 <Check className="w-4 h-4" />
-                <span className="text-sm font-medium">Ja</span>
+                <span className="text-sm font-medium">{t.yes}</span>
               </button>
               <button
                 onClick={() => updateDisease(q.key, false)}
@@ -115,7 +120,7 @@ export function ChronicDiseaseSelector({ value, onChange }: ChronicDiseaseSelect
                 )}
               >
                 <X className="w-4 h-4" />
-                <span className="text-sm font-medium">Nein</span>
+                <span className="text-sm font-medium">{t.no}</span>
               </button>
             </div>
           </div>
@@ -124,9 +129,9 @@ export function ChronicDiseaseSelector({ value, onChange }: ChronicDiseaseSelect
 
       {/* Other Diseases */}
       <div className="p-2 rounded-lg border border-border">
-        <span className="text-sm font-medium block mb-2">Andere Erkrankungen</span>
+        <span className="text-sm font-medium block mb-2">{t.otherDiseases}</span>
         <Input 
-          placeholder="Falls ja, welche?" 
+          placeholder={t.otherDiseasesPlaceholder} 
           value={value.otherDiseases || ''} 
           onChange={(e) => updateDisease('otherDiseases', e.target.value)} 
           className="text-sm h-10" 
