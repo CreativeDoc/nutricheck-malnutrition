@@ -69,6 +69,7 @@ export function Dashboard({ onLogout }: DashboardProps) {
       <ScreeningWizard
         patientCode={activePatient.patientCode}
         birthDate={activePatient.birthDate}
+        language={activePatient.language}
         onComplete={handleScreeningComplete}
         onCancel={handleExitScreening}
       />

@@ -1,19 +1,22 @@
 import { DrinkingAmount } from '@/types/screening';
 import { cn } from '@/lib/utils';
 import { GlassWater } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface DrinkingAmountSelectorProps {
   value: DrinkingAmount | null;
   onChange: (value: DrinkingAmount) => void;
 }
 
-const drinkingOptions: { value: DrinkingAmount; label: string; glasses: number }[] = [
-  { value: '<1l', label: 'Weniger als 1 Liter', glasses: 2 },
-  { value: '1.5l', label: 'Etwa 1,5 Liter', glasses: 4 },
-  { value: '>1.5l', label: 'Mehr als 1,5 Liter', glasses: 6 },
-];
-
 export function DrinkingAmountSelector({ value, onChange }: DrinkingAmountSelectorProps) {
+  const { t } = useTranslation();
+
+  const drinkingOptions: { value: DrinkingAmount; label: string; glasses: number }[] = [
+    { value: '<1l', label: t.drinkingLess1, glasses: 2 },
+    { value: '1.5l', label: t.drinking1point5, glasses: 4 },
+    { value: '>1.5l', label: t.drinkingMore1point5, glasses: 6 },
+  ];
+
   return (
     <div className="flex flex-col gap-2">
       {drinkingOptions.map((option) => (

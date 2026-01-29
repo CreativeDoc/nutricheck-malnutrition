@@ -1,20 +1,23 @@
 import { cn } from '@/lib/utils';
 import { UtensilsCrossed } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface MealsPerDaySelectorProps {
   value: number | null;
   onChange: (value: number) => void;
 }
 
-const mealOptions = [
-  { value: 1, label: '1 Mahlzeit' },
-  { value: 2, label: '2 Mahlzeiten' },
-  { value: 3, label: '3 Mahlzeiten' },
-  { value: 4, label: '4 Mahlzeiten' },
-  { value: 5, label: '5+ Mahlzeiten' },
-];
-
 export function MealsPerDaySelector({ value, onChange }: MealsPerDaySelectorProps) {
+  const { t } = useTranslation();
+
+  const mealOptions = [
+    { value: 1, label: t.meal1 },
+    { value: 2, label: t.meal2 },
+    { value: 3, label: t.meal3 },
+    { value: 4, label: t.meal4 },
+    { value: 5, label: t.meal5plus },
+  ];
+
   return (
     <div className="grid grid-cols-1 gap-2">
       {mealOptions.map((option) => (
