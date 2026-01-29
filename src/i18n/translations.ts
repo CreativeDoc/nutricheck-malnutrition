@@ -12,6 +12,33 @@ export interface Translations {
   newScreening: string;
   copyReport: string;
   
+  // Intro
+  introTitle: string;
+  introText1: string;
+  introText2: string;
+  introText3: string;
+  introText4: string;
+  introText5: string;
+  introText6: string;
+  introText7: string;
+  introText8: string;
+  introText9: string;
+  introText10: string;
+  introPrivacy: string;
+  introLetsGo: string;
+  introContinue: string;
+  
+  // Patient Form
+  patientFormTitle: string;
+  patientFormDescription: string;
+  firstName: string;
+  firstNamePlaceholder: string;
+  lastName: string;
+  lastNamePlaceholder: string;
+  birthDateLabel: string;
+  patientCode: string;
+  startScreening: string;
+  
   // Gender
   genderQuestion: string;
   male: string;
@@ -186,6 +213,33 @@ export const translations: Record<PatientLanguage, Translations> = {
     newScreening: 'Neues Screening',
     copyReport: 'Bericht kopieren',
     
+    // Intro
+    introTitle: 'Einleitung',
+    introText1: 'Mangelernährung bei Menschen ist nicht selten.',
+    introText2: 'Die Ursachen sind vielfältig, dazu gehören unter anderem konsumierende Erkrankungen wie Krebs, Rheuma, chronische Lungenerkrankungen, schwere Herzinsuffizienz und viele andere.',
+    introText3: 'Auch nach schweren Erkrankungen, Unfällen, Operationen und im Alter kann es zu Mangelernährungszuständen kommen.',
+    introText4: 'Appetitlosigkeit ist ein Leitsymptom der Mangelernährung.',
+    introText5: 'Folge davon sind nicht nur teilweise beträchtlicher Gewichtsverlust, sondern auch häufig Kraftverlust durch Muskelabbau, Immobilität, Konzentrationsschwäche, Schwindel, Antriebslosigkeit, verringerte Infektabwehr, erhöhte Infektionsgefahr und schlechtere Verträglichkeit von Therapien (z.B. Chemotherapie, Antibiotikatherapie).',
+    introText6: 'Auch ungesunde Diäten (z.B. Nulldiät, streng vegane Kost etc.) können zu Mangelzuständen von Vitaminen, Eiweiß und Spurenelementen führen.',
+    introText7: 'Jeder Mangelernährungszustand kann behandelt bzw. ausgeglichen werden.',
+    introText8: 'Voraussetzung dafür ist die Erfassung des aktuellen Ernährungszustandes.',
+    introText9: 'Häufig wird heute in der medizinischen Einrichtung der Ernährungszustand wenig beachtet und daher ein Mangel nicht erkannt und folglich auch nicht behandelt.',
+    introText10: 'Aus diesem Grunde wurde der folgende Fragebogen von Ernährungsmedizinern, Diätassistentinnen, Krankenschwestern und Pharmazeuten entwickelt. Nachdem Sie ihn ausgefüllt haben, wird er von Spezialisten ausgewertet und Ihr Ergebnis und die daraus resultierenden Therapievorschläge schnellstmöglich übermittelt.',
+    introPrivacy: 'Alle Daten werden verschlüsselt und können nur in Ihrer Praxis von Ihrem vertrauten Arzt/Ärztin oder medizinischem Fachpersonal Ihnen zugeordnet werden. Niemand außerhalb der medizinischen Einrichtung kann die Daten Ihnen zuordnen.',
+    introLetsGo: 'Und nun kann es losgehen:',
+    introContinue: 'Weiter zur Patientenerfassung',
+    
+    // Patient Form
+    patientFormTitle: 'Neuen Patienten anlegen',
+    patientFormDescription: 'Geben Sie die Initialen und das Geburtsdatum ein. Es werden keine Klarnamen gespeichert.',
+    firstName: 'Vorname (Initial)',
+    firstNamePlaceholder: 'Hans',
+    lastName: 'Nachname (Initial)',
+    lastNamePlaceholder: 'Müller',
+    birthDateLabel: 'Geburtsdatum',
+    patientCode: 'Patienten-Code',
+    startScreening: 'Screening starten',
+    
     // Gender
     genderQuestion: 'Welches Geschlecht haben Sie?',
     male: 'Männlich',
@@ -359,6 +413,33 @@ export const translations: Record<PatientLanguage, Translations> = {
     newScreening: 'New Screening',
     copyReport: 'Copy Report',
     
+    // Intro
+    introTitle: 'Introduction',
+    introText1: 'Malnutrition in humans is not uncommon.',
+    introText2: 'The causes are varied, including consuming diseases such as cancer, rheumatism, chronic lung diseases, severe heart failure, and many others.',
+    introText3: 'Malnutrition can also occur after serious illnesses, accidents, surgeries, and in old age.',
+    introText4: 'Loss of appetite is a key symptom of malnutrition.',
+    introText5: 'The consequences include not only significant weight loss, but also often loss of strength due to muscle breakdown, immobility, difficulty concentrating, dizziness, lack of drive, reduced immune defense, increased risk of infection, and poorer tolerance of therapies (e.g., chemotherapy, antibiotic therapy).',
+    introText6: 'Unhealthy diets (e.g., fasting, strict vegan diets, etc.) can also lead to deficiencies in vitamins, protein, and trace elements.',
+    introText7: 'Every state of malnutrition can be treated or compensated.',
+    introText8: 'The prerequisite for this is to assess the current nutritional status.',
+    introText9: 'Nowadays, nutritional status is often overlooked in medical facilities, meaning deficiencies are not recognized and therefore not treated.',
+    introText10: 'For this reason, the following questionnaire was developed by nutritional medicine specialists, dietitians, nurses, and pharmacists. After you complete it, it will be evaluated by specialists and your results and resulting therapy recommendations will be communicated as soon as possible.',
+    introPrivacy: 'All data is encrypted and can only be associated with you by your trusted doctor or medical staff in your practice. No one outside the medical facility can associate the data with you.',
+    introLetsGo: 'And now let\'s get started:',
+    introContinue: 'Continue to Patient Registration',
+    
+    // Patient Form
+    patientFormTitle: 'Register New Patient',
+    patientFormDescription: 'Enter the initials and date of birth. No full names are stored.',
+    firstName: 'First Name (Initial)',
+    firstNamePlaceholder: 'John',
+    lastName: 'Last Name (Initial)',
+    lastNamePlaceholder: 'Smith',
+    birthDateLabel: 'Date of Birth',
+    patientCode: 'Patient Code',
+    startScreening: 'Start Screening',
+    
     // Gender
     genderQuestion: 'What is your gender?',
     male: 'Male',
@@ -531,6 +612,33 @@ export const translations: Record<PatientLanguage, Translations> = {
     dashboard: 'Панель управления',
     newScreening: 'Новый скрининг',
     copyReport: 'Копировать отчёт',
+    
+    // Intro
+    introTitle: 'Введение',
+    introText1: 'Недоедание у людей не является редкостью.',
+    introText2: 'Причины разнообразны: истощающие заболевания, такие как рак, ревматизм, хронические заболевания лёгких, тяжёлая сердечная недостаточность и многие другие.',
+    introText3: 'Недоедание также может возникнуть после тяжёлых заболеваний, несчастных случаев, операций и в пожилом возрасте.',
+    introText4: 'Потеря аппетита является ключевым симптомом недоедания.',
+    introText5: 'Последствия включают не только значительную потерю веса, но и потерю силы из-за атрофии мышц, малоподвижность, нарушение концентрации, головокружение, апатию, снижение иммунитета, повышенный риск инфекций и худшую переносимость терапии (например, химиотерапии, антибиотикотерапии).',
+    introText6: 'Нездоровые диеты (голодание, строгое веганство и т.д.) также могут привести к дефициту витаминов, белка и микроэлементов.',
+    introText7: 'Любое состояние недоедания можно лечить или компенсировать.',
+    introText8: 'Предпосылкой для этого является оценка текущего состояния питания.',
+    introText9: 'В настоящее время в медицинских учреждениях состояние питания часто упускается из виду, поэтому дефицит не распознаётся и не лечится.',
+    introText10: 'По этой причине следующий опросник был разработан специалистами по нутрициологии, диетологами, медсёстрами и фармацевтами. После его заполнения он будет оценён специалистами, и ваши результаты и рекомендации по терапии будут переданы как можно скорее.',
+    introPrivacy: 'Все данные зашифрованы и могут быть связаны с вами только вашим лечащим врачом или медицинским персоналом в вашей клинике. Никто за пределами медицинского учреждения не может связать данные с вами.',
+    introLetsGo: 'А теперь начнём:',
+    introContinue: 'Перейти к регистрации пациента',
+    
+    // Patient Form
+    patientFormTitle: 'Зарегистрировать нового пациента',
+    patientFormDescription: 'Введите инициалы и дату рождения. Полные имена не сохраняются.',
+    firstName: 'Имя (инициал)',
+    firstNamePlaceholder: 'Иван',
+    lastName: 'Фамилия (инициал)',
+    lastNamePlaceholder: 'Петров',
+    birthDateLabel: 'Дата рождения',
+    patientCode: 'Код пациента',
+    startScreening: 'Начать скрининг',
     
     // Gender
     genderQuestion: 'Какой у вас пол?',

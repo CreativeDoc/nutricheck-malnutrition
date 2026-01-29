@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import { UserPlus, Play } from 'lucide-react';
 import { Patient, PatientLanguage } from '@/types/screening';
+import { getTranslations } from '@/hooks/useTranslation';
 
 interface PatientFormProps {
   open: boolean;
@@ -20,6 +21,7 @@ interface PatientFormProps {
 }
 
 export function PatientForm({ open, onOpenChange, onSubmit, selectedLanguage }: PatientFormProps) {
+  const t = getTranslations(selectedLanguage);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [birthDate, setBirthDate] = useState('');
@@ -62,10 +64,10 @@ export function PatientForm({ open, onOpenChange, onSubmit, selectedLanguage }: 
         <DialogHeader>
           <DialogTitle className="text-senior-lg flex items-center gap-3">
             <UserPlus className="w-6 h-6 text-primary" />
-            Neuen Patienten anlegen
+            {t.patientFormTitle}
           </DialogTitle>
           <DialogDescription className="text-senior">
-            Geben Sie die Initialen und das Geburtsdatum ein. Es werden keine Klarnamen gespeichert.
+            {t.patientFormDescription}
           </DialogDescription>
         </DialogHeader>
 
@@ -73,11 +75,11 @@ export function PatientForm({ open, onOpenChange, onSubmit, selectedLanguage }: 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="firstName" className="text-senior">
-                Vorname (Initial)
+                {t.firstName}
               </Label>
               <Input
                 id="firstName"
-                placeholder="Hans"
+                placeholder={t.firstNamePlaceholder}
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 className="text-senior h-14"
@@ -86,11 +88,11 @@ export function PatientForm({ open, onOpenChange, onSubmit, selectedLanguage }: 
             </div>
             <div className="space-y-2">
               <Label htmlFor="lastName" className="text-senior">
-                Nachname (Initial)
+                {t.lastName}
               </Label>
               <Input
                 id="lastName"
-                placeholder="Müller"
+                placeholder={t.lastNamePlaceholder}
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 className="text-senior h-14"
@@ -101,7 +103,7 @@ export function PatientForm({ open, onOpenChange, onSubmit, selectedLanguage }: 
 
           <div className="space-y-2">
             <Label htmlFor="birthDate" className="text-senior">
-              Geburtsdatum
+              {t.birthDateLabel}
             </Label>
             <Input
               id="birthDate"
@@ -115,7 +117,7 @@ export function PatientForm({ open, onOpenChange, onSubmit, selectedLanguage }: 
 
           {patientCode && (
             <div className="p-4 bg-accent rounded-xl">
-              <p className="text-sm text-muted-foreground mb-1">Patienten-Code</p>
+              <p className="text-sm text-muted-foreground mb-1">{t.patientCode}</p>
               <p className="text-senior-lg font-mono font-bold text-foreground">
                 {patientCode}
               </p>
@@ -128,7 +130,7 @@ export function PatientForm({ open, onOpenChange, onSubmit, selectedLanguage }: 
             className="btn-xl w-full gap-3"
           >
             <Play className="w-6 h-6" />
-            Screening starten
+            {t.startScreening}
           </Button>
         </form>
       </DialogContent>

@@ -182,6 +182,7 @@ export function Dashboard({ onLogout }: DashboardProps) {
         open={showIntro}
         onOpenChange={setShowIntro}
         onContinue={handleIntroComplete}
+        language={selectedLanguage}
       />
 
       <PatientForm
