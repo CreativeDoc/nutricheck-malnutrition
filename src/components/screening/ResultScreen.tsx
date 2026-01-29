@@ -176,33 +176,9 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
           </div>
         )}
 
-        {/* Therapy Recommendations - always shown for at-risk patients */}
-        {result.isAtRisk && result.recommendations && (
-          <div className="space-y-6 mb-8 animate-scale-in">
-            <h2 className="text-senior-xl font-bold text-foreground text-center">
-              {t.therapyRecommendation}
-            </h2>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-card border-2 border-border rounded-2xl p-6 text-center">
-                <Flame className="w-10 h-10 mx-auto mb-3 text-warning" />
-                <p className="text-senior text-muted-foreground mb-1">{t.energy}</p>
-                <p className="text-senior-2xl font-bold text-foreground">
-                  {result.recommendations.energy}
-                </p>
-                <p className="text-senior text-muted-foreground">kcal{t.perDay}</p>
-              </div>
-
-              <div className="bg-card border-2 border-border rounded-2xl p-6 text-center">
-                <Utensils className="w-10 h-10 mx-auto mb-3 text-primary" />
-                <p className="text-senior text-muted-foreground mb-1">{t.protein}</p>
-                <p className="text-senior-2xl font-bold text-foreground">
-                  {result.recommendations.protein}
-                </p>
-                <p className="text-senior text-muted-foreground">g{t.perDay}</p>
-              </div>
-            </div>
-
+        {/* Copy Report Button */}
+        {result.isAtRisk && (
+          <div className="mb-8 animate-scale-in">
             <Button
               onClick={copyReport}
               variant="outline"
