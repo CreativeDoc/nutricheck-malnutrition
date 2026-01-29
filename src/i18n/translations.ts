@@ -382,7 +382,7 @@ export const translations: Record<PatientLanguage, Translations> = {
     
     // Counseling
     counselingQuestion: 'Möchten Sie eine Beratung hinsichtlich einer für Sie geeigneten Ernährungstherapie?',
-    counselingThankYou: 'Vielen Dank! Ein spezialisierter Ernährungsmediziner wird sich mit der Praxis in Verbindung setzen, um die weiteren Schritte mit Ihnen zu besprechen.',
+    counselingThankYou: 'Vielen Dank! Ein spezialisierter Ernährungsmediziner wird sich mit der Praxis in Verbindung setzen, um die weiteren Schritte abzusprechen.',
     
     // Therapy
     therapyRecommendation: 'Therapie-Empfehlung',
