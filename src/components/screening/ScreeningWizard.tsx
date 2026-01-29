@@ -87,12 +87,25 @@ function ScreeningWizardContent({
     answers.difficultyGettingUp !== null &&
     answers.shortnessOfBreath !== null;
 
+  const handleCounselingChoiceUpdate = (wantsCounseling: boolean) => {
+    setAnswers(prev => ({ ...prev, wantsNutritionCounseling: wantsCounseling }));
+    if (result) {
+      const updatedResult = {
+        ...result,
+        answers: { ...result.answers, wantsNutritionCounseling: wantsCounseling }
+      };
+      setResult(updatedResult);
+      onComplete(updatedResult);
+    }
+  };
+
   if (result) {
     return (
       <ResultScreen
         result={result}
         onNewScreening={onCancel}
         onBackToDashboard={onCancel}
+        onUpdateCounselingChoice={handleCounselingChoiceUpdate}
       />
     );
   }
