@@ -51,7 +51,7 @@ function ScreeningWizardContent({
     setAnswers(prev => ({ ...prev, [key]: value }));
   };
 
-  const totalSteps = 23;
+  const totalSteps = 22;
 
   const getStepNumber = (): number => {
     const stepOrder: WizardStep[] = [
@@ -59,7 +59,7 @@ function ScreeningWizardContent({
       'mealsPerDay', 'portionSize', 'appetiteByOthers',
       'fruitPerWeek', 'vegetablesPerWeek', 'sweetPreference', 'meatPerWeek', 'carbsPerWeek',
       'acuteDiseases', 'chronicDiseases', 'physicalCondition', 'drinkingAmount', 'swallowing',
-      'medication', 'supplements', 'nutritionTherapy', 'infusions', 'nutritionCounseling'
+      'medication', 'supplements', 'nutritionTherapy', 'infusions'
     ];
     const index = stepOrder.indexOf(currentStep);
     return index >= 0 ? index + 1 : 1;
@@ -704,13 +704,14 @@ function ScreeningWizardContent({
     case 'infusions':
       return (
         <QuestionLayout
-          step={23}
+          step={22}
           totalSteps={totalSteps}
           title={t.infusionsQuestion}
           canGoBack={true}
           canGoNext={answers.hadNutrientInfusions !== null}
+          isLastStep={true}
           onBack={() => goBack('nutritionTherapy')}
-          onNext={() => goNext('nutritionCounseling')}
+          onNext={finishScreening}
         >
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -735,35 +736,6 @@ function ScreeningWizardContent({
                 className="text-senior-base min-h-[100px]"
               />
             )}
-          </div>
-        </QuestionLayout>
-      );
-
-    case 'nutritionCounseling':
-      return (
-        <QuestionLayout
-          step={24}
-          totalSteps={totalSteps}
-          title={t.nutritionCounselingQuestion}
-          canGoBack={true}
-          canGoNext={answers.wantsNutritionCounseling !== null}
-          isLastStep={true}
-          onBack={() => goBack('infusions')}
-          onNext={finishScreening}
-        >
-          <div className="grid grid-cols-2 gap-4">
-            <QuestionCard
-              selected={answers.wantsNutritionCounseling === true}
-              onClick={() => updateAnswer('wantsNutritionCounseling', true)}
-            >
-              {t.yes}
-            </QuestionCard>
-            <QuestionCard
-              selected={answers.wantsNutritionCounseling === false}
-              onClick={() => updateAnswer('wantsNutritionCounseling', false)}
-            >
-              {t.no}
-            </QuestionCard>
           </div>
         </QuestionLayout>
       );
