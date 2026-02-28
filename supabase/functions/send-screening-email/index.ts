@@ -519,31 +519,53 @@ Deno.serve(async (req) => {
     }
 
     // Read CC email from app_settings via service role
-    const adminClient = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-    );
-    const { data: ccRow } = await adminClient
-      .from("app_settings")
-      .select("value")
-      .eq("key", "cc_email")
-      .single();
-    const ccEmail = ccRow?.value || null;
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
+    console.log("[DEBUG] SUPABASE_URL set:", !!supabaseUrl);
+    console.log("[DEBUG] SUPABASE_SERVICE_ROLE_KEY set:", !!serviceRoleKey);
+    console.log("[DEBUG] SUPABASE_SERVICE_ROLE_KEY length:", serviceRoleKey?.length ?? 0);
+
+    let ccEmail: string | null = null;
+    if (supabaseUrl && serviceRoleKey) {
+      const adminClient = createClient(supabaseUrl, serviceRoleKey);
+      const { data: ccRow, error: ccError } = await adminClient
+        .from("app_settings")
+        .select("value")
+        .eq("key", "cc_email")
+        .single();
+
+      console.log("[DEBUG] app_settings query result:", JSON.stringify(ccRow));
+      console.log("[DEBUG] app_settings query error:", JSON.stringify(ccError));
+      ccEmail = ccRow?.value || null;
+    } else {
+      console.log("[DEBUG] Skipping CC lookup — missing env vars");
+    }
+
+    console.log("[DEBUG] ccEmail resolved to:", ccEmail);
+    console.log("[DEBUG] practice_email from body:", body.practice_email);
 
     const config = levelConfig[body.malnutrition_level];
     const subject = `NutriCheck Screening: ${body.patient_code} – ${config.label}`;
 
+    // Build recipients: always include practice_email, add CC if different
+    const toAddresses = [body.practice_email];
+    if (ccEmail && ccEmail !== body.practice_email) {
+      toAddresses.push(ccEmail);
+    }
+
     const emailPayload: Record<string, unknown> = {
       from: "NutriCheck <noreply@staycozy.info>",
-      to: [body.practice_email],
+      to: toAddresses,
       subject,
       html: buildEmailHtml(body),
     };
 
-    // Add CC from app_settings
-    if (ccEmail) {
-      emailPayload.cc = [ccEmail];
-    }
+    console.log("[DEBUG] Resend payload (without html):", JSON.stringify({
+      from: emailPayload.from,
+      to: emailPayload.to,
+      subject: emailPayload.subject,
+    }));
 
     const resendRes = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -555,6 +577,8 @@ Deno.serve(async (req) => {
     });
 
     const resendData = await resendRes.json();
+    console.log("[DEBUG] Resend response status:", resendRes.status);
+    console.log("[DEBUG] Resend response body:", JSON.stringify(resendData));
 
     if (!resendRes.ok) {
       return new Response(
@@ -564,7 +588,15 @@ Deno.serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ success: true, id: resendData.id }),
+      JSON.stringify({
+        success: true,
+        id: resendData.id,
+        debug: {
+          to: toAddresses,
+          cc_email_from_db: ccEmail,
+          service_role_key_set: !!serviceRoleKey,
+        },
+      }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (error) {
