@@ -60,7 +60,7 @@ export function PatientForm({ open, onOpenChange, onSubmit, selectedLanguage }: 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md top-[5%] translate-y-0 max-h-[90vh] overflow-y-auto data-[state=open]:slide-in-from-top-[2%] data-[state=closed]:slide-out-to-top-[2%]">
         <DialogHeader>
           <DialogTitle className="text-senior-lg flex items-center gap-3">
             <UserPlus className="w-6 h-6 text-primary" />
