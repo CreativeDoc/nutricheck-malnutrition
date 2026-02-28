@@ -167,8 +167,8 @@ export function AdminDashboard() {
   };
 
   const handleResendEmail = async (s: ScreeningRow) => {
-    if (!s.practice_email) {
-      toast({ title: 'Keine Praxis-Email', variant: 'destructive' });
+    if (!ccEmail) {
+      toast({ title: 'Keine Admin-Email in Einstellungen hinterlegt', variant: 'destructive' });
       return;
     }
     setResendingId(s.id);
@@ -191,14 +191,14 @@ export function AdminDashboard() {
       malnutrition_level: s.malnutrition_level,
       report_text: reportText,
       wants_counseling: s.wants_counseling === true,
-      practice_email: s.practice_email,
+      practice_email: ccEmail,
       scores: s.scores,
       recommendations: s.scores.recommendations,
       answers: s.answers as Record<string, unknown>,
     });
 
     if (success) {
-      toast({ title: 'Email erneut gesendet', description: `An ${s.practice_email}` });
+      toast({ title: 'Email gesendet', description: `An ${ccEmail}` });
     } else {
       toast({ title: 'Fehler beim Email-Versand', variant: 'destructive' });
     }
@@ -434,7 +434,7 @@ export function AdminDashboard() {
                             ) : (
                               <Mail className="w-3 h-3" />
                             )}
-                            Email
+                            per Email senden
                           </Button>
                         </TableCell>
                       </TableRow>
