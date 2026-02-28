@@ -22,6 +22,61 @@ interface Recommendations {
   protein: number;
 }
 
+interface ScreeningAnswers {
+  birthDate: string;
+  gender: string | null;
+  height: number | null;
+  weight: number | null;
+  normalWeight: number | null;
+  weightUnknown: boolean;
+  hasWeightLoss: boolean | null;
+  weightLossAmount: string | null;
+  clothingLoose: boolean | null;
+  mealsPerDay: number | null;
+  portionSize: number | null;
+  appetiteByOthers: string | null;
+  fruitPerWeek: string | null;
+  vegetablesPerWeek: string | null;
+  sweetPreference: string | null;
+  meatPerWeek: string | null;
+  carbsPerWeek: string | null;
+  acuteDiseases: {
+    cancer: boolean | null;
+    cancerType?: string;
+    acuteInfection: boolean | null;
+    acuteInfectionDetails?: string;
+  };
+  chronicDiseases: {
+    heartFailure: boolean | null;
+    rheumatism: boolean | null;
+    lungDisease: boolean | null;
+    kidneyDisease: boolean | null;
+    stroke: boolean | null;
+    diarrhea: boolean | null;
+    nauseaVomiting: boolean | null;
+    gastrointestinalSurgery: boolean | null;
+    otherDiseases?: string;
+  };
+  feelsWeaker: boolean | null;
+  muscleLoss: boolean | null;
+  frequentInfections: boolean | null;
+  difficultyGettingUp: boolean | null;
+  shortnessOfBreath: boolean | null;
+  mobilityLevel: string | null;
+  drinkingAmount: string | null;
+  hasSwallowingIssues: boolean | null;
+  swallowingDetails?: string;
+  takesMedication: boolean | null;
+  medicationDetails?: string;
+  hasSupplementExperience: boolean | null;
+  supplementDetails?: string;
+  hadNutritionTherapy: boolean | null;
+  nutritionTherapyDetails?: string;
+  hadNutrientInfusions: boolean | null;
+  infusionDetails?: string;
+  wantsNutritionCounseling: boolean | null;
+}
+
 interface ScreeningRequest {
   patient_code: string;
   patient_birth_date: string;
@@ -30,8 +85,10 @@ interface ScreeningRequest {
   report_text: string;
   wants_counseling: boolean;
   practice_email: string;
+  cc_email?: string;
   scores: Scores;
   recommendations?: Recommendations;
+  answers?: ScreeningAnswers;
 }
 
 const levelConfig: Record<
@@ -46,6 +103,199 @@ const levelConfig: Record<
 const BRAND = "#2268B2";
 const BRAND_LIGHT = "#eaf1fb";
 const BRAND_DARK = "#1a4f8a";
+
+// --- Helper formatters ---
+
+function fmtBool(val: boolean | null | undefined): string {
+  if (val === null || val === undefined) return "Keine Angabe";
+  return val ? "Ja" : "Nein";
+}
+
+function fmtVal(val: string | number | null | undefined): string {
+  if (val === null || val === undefined) return "Keine Angabe";
+  return String(val);
+}
+
+function fmtGender(val: string | null): string {
+  if (!val) return "Keine Angabe";
+  const map: Record<string, string> = { male: "Männlich", female: "Weiblich", diverse: "Divers" };
+  return map[val] || val;
+}
+
+function fmtPortionSize(val: number | null): string {
+  if (val === null) return "Keine Angabe";
+  return `${val}%`;
+}
+
+function fmtFrequency(val: string | null): string {
+  if (!val) return "Keine Angabe";
+  const map: Record<string, string> = {
+    "0": "0x / Woche",
+    "1-2": "1-2x / Woche",
+    "3-4": "3-4x / Woche",
+    "5-7": "5-7x / Woche",
+    daily: "Täglich",
+  };
+  return map[val] || val;
+}
+
+function fmtAppetite(val: string | null): string {
+  if (!val) return "Keine Angabe";
+  return val === "normal" ? "Normal" : "Eingeschränkt";
+}
+
+function fmtMobility(val: string | null): string {
+  if (!val) return "Keine Angabe";
+  return val === "indoor" ? "Nur in der Wohnung" : "Auch außerhalb";
+}
+
+function fmtDrinking(val: string | null): string {
+  if (!val) return "Keine Angabe";
+  const map: Record<string, string> = { "<1l": "Weniger als 1 Liter", "1.5l": "Ca. 1,5 Liter", ">1.5l": "Mehr als 1,5 Liter" };
+  return map[val] || val;
+}
+
+function fmtSweet(val: string | null): string {
+  if (!val) return "Keine Angabe";
+  return val === "like" ? "Mag Süßes" : "Mag kein Süßes";
+}
+
+function fmtWeightLoss(val: string | null): string {
+  if (!val) return "Keine Angabe";
+  const map: Record<string, string> = { none: "Kein Gewichtsverlust", "1-3kg": "1–3 kg", "3-6kg": "3–6 kg", ">6kg": "Mehr als 6 kg" };
+  return map[val] || val;
+}
+
+// --- Build detail answer row ---
+
+function answerRow(label: string, value: string, idx: number): string {
+  const bg = idx % 2 === 0 ? "#ffffff" : "#f9fafb";
+  return `<tr style="background:${bg};">
+    <td style="padding:9px 16px;font-size:13px;color:#6b7280;border-bottom:1px solid #f3f4f6;width:200px;">${label}</td>
+    <td style="padding:9px 16px;font-size:14px;font-weight:600;color:#111827;border-bottom:1px solid #f3f4f6;">${value}</td>
+  </tr>`;
+}
+
+function buildAnswerSection(title: string, rows: [string, string][]): string {
+  const rowsHtml = rows.map(([label, value], i) => answerRow(label, value, i)).join("");
+  return `<tr>
+    <td style="padding:0 40px 28px;">
+      <p style="margin:0 0 10px;font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:1px;">${title}</p>
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;border-collapse:separate;">
+        ${rowsHtml}
+      </table>
+    </td>
+  </tr>`;
+}
+
+function buildDetailedAnswersHtml(a: ScreeningAnswers): string {
+  const sections: string[] = [];
+
+  // Körperdaten
+  sections.push(buildAnswerSection("Körperdaten", [
+    ["Geschlecht", fmtGender(a.gender)],
+    ["Größe", a.height !== null ? `${a.height} cm` : "Keine Angabe"],
+    ["Gewicht", a.weight !== null ? `${a.weight} kg` : "Keine Angabe"],
+    ["BMI", a.height && a.weight ? (a.weight / ((a.height / 100) ** 2)).toFixed(1) : "Keine Angabe"],
+    ["Normalgewicht", a.normalWeight !== null ? `${a.normalWeight} kg` : "Keine Angabe"],
+  ]));
+
+  // Gewichtsverlust
+  sections.push(buildAnswerSection("Gewichtsverlust", [
+    ["Gewichtsverlust", fmtBool(a.hasWeightLoss)],
+    ["Menge", fmtWeightLoss(a.weightLossAmount)],
+    ["Kleidung weiter", fmtBool(a.clothingLoose)],
+  ]));
+
+  // Ernährung
+  sections.push(buildAnswerSection("Ernährung", [
+    ["Mahlzeiten pro Tag", fmtVal(a.mealsPerDay)],
+    ["Portionsgröße", fmtPortionSize(a.portionSize)],
+    ["Appetitbeurteilung", fmtAppetite(a.appetiteByOthers)],
+  ]));
+
+  // Ernährungshäufigkeit
+  sections.push(buildAnswerSection("Ernährungshäufigkeit", [
+    ["Obst", fmtFrequency(a.fruitPerWeek)],
+    ["Gemüse", fmtFrequency(a.vegetablesPerWeek)],
+    ["Süßigkeiten", fmtSweet(a.sweetPreference)],
+    ["Fleisch", fmtFrequency(a.meatPerWeek)],
+    ["Kohlenhydrate", fmtFrequency(a.carbsPerWeek)],
+  ]));
+
+  // Aktuelle Erkrankungen
+  const acuteRows: [string, string][] = [
+    ["Krebs", fmtBool(a.acuteDiseases?.cancer)],
+  ];
+  if (a.acuteDiseases?.cancer && a.acuteDiseases.cancerType) {
+    acuteRows.push(["Krebsart", a.acuteDiseases.cancerType]);
+  }
+  acuteRows.push(["Akute Infektionen", fmtBool(a.acuteDiseases?.acuteInfection)]);
+  if (a.acuteDiseases?.acuteInfection && a.acuteDiseases.acuteInfectionDetails) {
+    acuteRows.push(["Infektionsdetails", a.acuteDiseases.acuteInfectionDetails]);
+  }
+  sections.push(buildAnswerSection("Aktuelle Erkrankungen", acuteRows));
+
+  // Chronische Erkrankungen
+  const cd = a.chronicDiseases;
+  const chronicRows: [string, string][] = [
+    ["Herzschwäche", fmtBool(cd?.heartFailure)],
+    ["Rheuma", fmtBool(cd?.rheumatism)],
+    ["Lungenerkrankung", fmtBool(cd?.lungDisease)],
+    ["Nierenerkrankung", fmtBool(cd?.kidneyDisease)],
+    ["Schlaganfall", fmtBool(cd?.stroke)],
+    ["Durchfall", fmtBool(cd?.diarrhea)],
+    ["Übelkeit/Erbrechen", fmtBool(cd?.nauseaVomiting)],
+    ["Magen-Darm-OP", fmtBool(cd?.gastrointestinalSurgery)],
+  ];
+  if (cd?.otherDiseases) {
+    chronicRows.push(["Sonstige", cd.otherDiseases]);
+  }
+  sections.push(buildAnswerSection("Chronische Erkrankungen", chronicRows));
+
+  // Körperliches Befinden
+  sections.push(buildAnswerSection("Körperliches Befinden", [
+    ["Schwäche", fmtBool(a.feelsWeaker)],
+    ["Muskelabbau", fmtBool(a.muscleLoss)],
+    ["Infektanfälligkeit", fmtBool(a.frequentInfections)],
+    ["Schwierigkeit beim Aufstehen", fmtBool(a.difficultyGettingUp)],
+    ["Kurzatmigkeit", fmtBool(a.shortnessOfBreath)],
+  ]));
+
+  // Mobilität und Schlucken
+  const mobilityRows: [string, string][] = [
+    ["Mobilität", fmtMobility(a.mobilityLevel)],
+    ["Trinkmenge", fmtDrinking(a.drinkingAmount)],
+    ["Schluckbeschwerden", fmtBool(a.hasSwallowingIssues)],
+  ];
+  if (a.hasSwallowingIssues && a.swallowingDetails) {
+    mobilityRows.push(["Schluckdetails", a.swallowingDetails]);
+  }
+  sections.push(buildAnswerSection("Mobilität und Schlucken", mobilityRows));
+
+  // Medikation
+  const medRows: [string, string][] = [
+    ["Medikamente", fmtBool(a.takesMedication)],
+  ];
+  if (a.takesMedication && a.medicationDetails) {
+    medRows.push(["Medikamentendetails", a.medicationDetails]);
+  }
+  medRows.push(["Nahrungsergänzung", fmtBool(a.hasSupplementExperience)]);
+  if (a.hasSupplementExperience && a.supplementDetails) {
+    medRows.push(["Ergänzungsdetails", a.supplementDetails]);
+  }
+  medRows.push(["Ernährungstherapie", fmtBool(a.hadNutritionTherapy)]);
+  if (a.hadNutritionTherapy && a.nutritionTherapyDetails) {
+    medRows.push(["Therapiedetails", a.nutritionTherapyDetails]);
+  }
+  medRows.push(["Infusionen", fmtBool(a.hadNutrientInfusions)]);
+  if (a.hadNutrientInfusions && a.infusionDetails) {
+    medRows.push(["Infusionsdetails", a.infusionDetails]);
+  }
+  sections.push(buildAnswerSection("Medikation", medRows));
+
+  return sections.join("");
+}
 
 function buildEmailHtml(data: ScreeningRequest): string {
   const lvl = levelConfig[data.malnutrition_level];
@@ -134,6 +384,9 @@ function buildEmailHtml(data: ScreeningRequest): string {
         </table>
       </td></tr>`;
 
+  // Detailed answers section
+  const detailedAnswersHtml = data.answers ? buildDetailedAnswersHtml(data.answers) : "";
+
   return `<!DOCTYPE html>
 <html lang="de">
 <head>
@@ -213,6 +466,9 @@ function buildEmailHtml(data: ScreeningRequest): string {
         <!-- ===== BERATUNGSWUNSCH ===== -->
         ${counselingHtml}
 
+        <!-- ===== DETAILLIERTE ANTWORTEN ===== -->
+        ${detailedAnswersHtml}
+
         <!-- ===== FOOTER ===== -->
         <tr>
           <td style="background:#f9fafb;padding:24px 40px;border-top:1px solid #e5e7eb;">
@@ -265,18 +521,25 @@ Deno.serve(async (req) => {
     const config = levelConfig[body.malnutrition_level];
     const subject = `NutriCheck Screening: ${body.patient_code} – ${config.label}`;
 
+    const emailPayload: Record<string, unknown> = {
+      from: "NutriCheck <noreply@staycozy.info>",
+      to: [body.practice_email],
+      subject,
+      html: buildEmailHtml(body),
+    };
+
+    // Add CC if provided
+    if (body.cc_email) {
+      emailPayload.cc = [body.cc_email];
+    }
+
     const resendRes = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${resendApiKey}`,
       },
-      body: JSON.stringify({
-        from: "NutriCheck <noreply@staycozy.info>",
-        to: [body.practice_email],
-        subject,
-        html: buildEmailHtml(body),
-      }),
+      body: JSON.stringify(emailPayload),
     });
 
     const resendData = await resendRes.json();

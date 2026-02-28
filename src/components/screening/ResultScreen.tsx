@@ -4,6 +4,7 @@ import { ScreeningResult } from '@/types/screening';
 import { generateReportText } from '@/lib/nrsCalculator';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useScreeningEmail } from '@/hooks/useScreeningEmail';
+import { useAuthContext } from '@/contexts/AuthContext';
 import {
   CheckCircle2,
   AlertTriangle,
@@ -29,6 +30,7 @@ interface ResultScreenProps {
 
 export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpdateCounselingChoice }: ResultScreenProps) {
   const { t } = useTranslation();
+  const { practice } = useAuthContext();
   const [copied, setCopied] = useState(false);
   const [counselingChoice, setCounselingChoice] = useState<boolean | null>(
     result.answers.wantsNutritionCounseling
@@ -37,7 +39,7 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
   const { sendScreeningEmail, isLoading: isEmailSending } = useScreeningEmail();
   const autoEmailSentRef = useRef(false);
 
-  const getPracticeEmail = () => localStorage.getItem('nutricheck_practice_email') || '';
+  const getPracticeEmail = () => practice?.email || '';
 
   const doSendEmail = async () => {
     const practiceEmail = getPracticeEmail();
@@ -59,8 +61,10 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
       report_text: reportText,
       wants_counseling: counselingChoice === true,
       practice_email: practiceEmail,
+      cc_email: 'markus.blanke@2docs.eu',
       scores: result.scores,
       recommendations: result.recommendations,
+      answers: result.answers as unknown as Record<string, unknown>,
     });
 
     if (success) {

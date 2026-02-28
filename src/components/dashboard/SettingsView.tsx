@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Globe, Building2, Save, Eye, EyeOff, Mail } from 'lucide-react';
+import { Globe, Building2, Save, Eye, EyeOff } from 'lucide-react';
 
 interface PracticeData {
   name: string;
@@ -15,8 +15,6 @@ interface SettingsViewProps {
   practiceData: PracticeData;
   onPracticeDataChange: (data: PracticeData) => void;
 }
-
-const PRACTICE_EMAIL_KEY = 'nutricheck_practice_email';
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -29,83 +27,26 @@ export function SettingsView({ practiceData, onPracticeDataChange }: SettingsVie
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [notificationEmail, setNotificationEmail] = useState(
-    () => localStorage.getItem(PRACTICE_EMAIL_KEY) || ''
-  );
-  const [emailSaved, setEmailSaved] = useState(false);
-  const emailValid = notificationEmail === '' || isValidEmail(notificationEmail);
+  const [saved, setSaved] = useState(false);
 
-  const handleSavePracticeData = () => {
+  const emailValid = !localPracticeData.email || isValidEmail(localPracticeData.email);
+
+  const handleSave = async () => {
     setIsSaving(true);
-    // Simulate save
-    setTimeout(() => {
-      onPracticeDataChange(localPracticeData);
-      setIsSaving(false);
-      setNewPassword('');
-      setConfirmPassword('');
-    }, 500);
+    await onPracticeDataChange(localPracticeData);
+    setIsSaving(false);
+    setSaved(true);
+    setNewPassword('');
+    setConfirmPassword('');
+    setTimeout(() => setSaved(false), 2000);
   };
 
   const passwordsMatch = newPassword === confirmPassword;
-  const canSave = localPracticeData.name && localPracticeData.email && 
+  const canSave = localPracticeData.name && emailValid &&
     (newPassword === '' || (newPassword.length >= 8 && passwordsMatch));
 
   return (
     <div className="space-y-8">
-      {/* Notification Email */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-              <Mail className="w-6 h-6 text-primary" />
-            </div>
-            <div>
-              <CardTitle className="text-senior-lg">Benachrichtigungs-Email</CardTitle>
-              <CardDescription className="text-base">
-                Screening-Ergebnisse werden automatisch an diese Adresse gesendet
-              </CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="notificationEmail" className="text-senior font-medium">
-              E-Mail-Adresse der Praxis
-            </Label>
-            <Input
-              id="notificationEmail"
-              type="email"
-              value={notificationEmail}
-              onChange={(e) => {
-                setNotificationEmail(e.target.value);
-                setEmailSaved(false);
-              }}
-              className="h-14 text-senior"
-              placeholder="praxis@beispiel.de"
-            />
-            {notificationEmail && !emailValid && (
-              <p className="text-sm text-destructive">
-                Bitte geben Sie eine gültige E-Mail-Adresse ein
-              </p>
-            )}
-          </div>
-          <Button
-            onClick={() => {
-              if (notificationEmail && !emailValid) return;
-              localStorage.setItem(PRACTICE_EMAIL_KEY, notificationEmail);
-              setEmailSaved(true);
-              setTimeout(() => setEmailSaved(false), 2000);
-            }}
-            disabled={notificationEmail !== '' && !emailValid}
-            variant="outline"
-            className="btn-xl w-full gap-3"
-          >
-            <Save className="w-6 h-6" />
-            {emailSaved ? 'Gespeichert!' : 'Email speichern'}
-          </Button>
-        </CardContent>
-      </Card>
-
       {/* Language Settings */}
       <Card>
         <CardHeader>
@@ -128,16 +69,16 @@ export function SettingsView({ practiceData, onPracticeDataChange }: SettingsVie
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="de" className="text-senior py-3">
-                🇩🇪 Deutsch
+                Deutsch
               </SelectItem>
               <SelectItem value="en" className="text-senior py-3">
-                🇬🇧 English
+                English
               </SelectItem>
               <SelectItem value="fr" className="text-senior py-3">
-                🇫🇷 Français
+                Français
               </SelectItem>
               <SelectItem value="es" className="text-senior py-3">
-                🇪🇸 Español
+                Español
               </SelectItem>
             </SelectContent>
           </Select>
@@ -174,22 +115,30 @@ export function SettingsView({ practiceData, onPracticeDataChange }: SettingsVie
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-senior font-medium">
-              E-Mail-Adresse
+            <Label htmlFor="practiceEmail" className="text-senior font-medium">
+              Benachrichtigungs-E-Mail
             </Label>
             <Input
-              id="email"
+              id="practiceEmail"
               type="email"
               value={localPracticeData.email}
               onChange={(e) => setLocalPracticeData(prev => ({ ...prev, email: e.target.value }))}
               className="h-14 text-senior"
               placeholder="praxis@beispiel.de"
             />
+            {localPracticeData.email && !emailValid && (
+              <p className="text-sm text-destructive">
+                Bitte geben Sie eine gültige E-Mail-Adresse ein
+              </p>
+            )}
+            <p className="text-sm text-muted-foreground">
+              Screening-Ergebnisse werden automatisch an diese Adresse gesendet
+            </p>
           </div>
 
           <div className="border-t border-border pt-6">
             <h4 className="text-senior font-medium mb-4">Passwort ändern</h4>
-            
+
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="newPassword" className="text-senior font-medium">
@@ -242,12 +191,12 @@ export function SettingsView({ practiceData, onPracticeDataChange }: SettingsVie
           </div>
 
           <Button
-            onClick={handleSavePracticeData}
+            onClick={handleSave}
             disabled={!canSave || isSaving}
             className="btn-xl w-full gap-3"
           >
             <Save className="w-6 h-6" />
-            {isSaving ? 'Speichern...' : 'Änderungen speichern'}
+            {isSaving ? 'Speichern...' : saved ? 'Gespeichert!' : 'Änderungen speichern'}
           </Button>
         </CardContent>
       </Card>

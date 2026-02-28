@@ -11,6 +11,7 @@ export interface ScreeningEmailParams {
   report_text: string;
   wants_counseling: boolean;
   practice_email: string;
+  cc_email?: string;
   scores: {
     bmi: number;
     weightLossScore: number;
@@ -23,6 +24,7 @@ export interface ScreeningEmailParams {
     energy: number;
     protein: number;
   };
+  answers?: Record<string, unknown>;
 }
 
 export function useScreeningEmail() {

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Header } from '@/components/dashboard/Header';
 import { PatientForm } from '@/components/dashboard/PatientForm';
 import { SettingsView } from '@/components/dashboard/SettingsView';
@@ -10,19 +10,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Patient, PatientLanguage, ScreeningResult } from '@/types/screening';
 import { UserPlus, Activity, ArrowLeft, ClipboardList } from 'lucide-react';
-
-interface DashboardProps {
-  onLogout: () => void;
-}
-
-interface PracticeData {
-  name: string;
-  email: string;
-}
+import { useAuthContext } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
 
 type DashboardView = 'home' | 'settings' | 'screenings';
 
-export function Dashboard({ onLogout }: DashboardProps) {
+export function Dashboard() {
+  const { signOut, user, practice, updatePractice } = useAuthContext();
   const [showLanguageSelector, setShowLanguageSelector] = useState(false);
   const [showIntro, setShowIntro] = useState(false);
   const [showPatientForm, setShowPatientForm] = useState(false);
@@ -30,10 +24,33 @@ export function Dashboard({ onLogout }: DashboardProps) {
   const [currentView, setCurrentView] = useState<DashboardView>('home');
   const [activePatient, setActivePatient] = useState<Patient | null>(null);
   const [screenings, setScreenings] = useState<ScreeningResult[]>([]);
-  const [practiceData, setPracticeData] = useState<PracticeData>({
-    name: 'Ihre Praxis',
-    email: 'praxis@beispiel.de'
-  });
+  const screeningSavedRef = useRef(false);
+
+  const loadScreenings = useCallback(async () => {
+    if (!practice) return;
+    const { data } = await supabase
+      .from('screenings')
+      .select('*')
+      .eq('practice_id', practice.id)
+      .order('created_at', { ascending: false });
+
+    if (data) {
+      setScreenings(data.map(row => ({
+        patientCode: row.patient_code,
+        answers: row.answers,
+        scores: row.scores,
+        totalScore: row.total_score,
+        malnutritionLevel: row.malnutrition_level,
+        isAtRisk: row.is_at_risk,
+        recommendations: row.scores?.recommendations,
+        createdAt: new Date(row.created_at),
+      })));
+    }
+  }, [practice]);
+
+  useEffect(() => {
+    loadScreenings();
+  }, [loadScreenings]);
 
   const handleStartScreening = () => {
     setShowLanguageSelector(true);
@@ -55,12 +72,34 @@ export function Dashboard({ onLogout }: DashboardProps) {
     setShowPatientForm(false);
   };
 
-  const handleScreeningComplete = (result: ScreeningResult) => {
-    setScreenings(prev => [result, ...prev]);
+  const handleScreeningComplete = async (result: ScreeningResult) => {
+    if (practice && user && !screeningSavedRef.current) {
+      // First call: insert into DB
+      screeningSavedRef.current = true;
+      await supabase.from('screenings').insert({
+        practice_id: practice.id,
+        created_by: user.id,
+        patient_code: result.patientCode,
+        birth_date: result.answers.birthDate || null,
+        language: selectedLanguage,
+        answers: result.answers,
+        scores: result.scores,
+        total_score: result.totalScore,
+        malnutrition_level: result.malnutritionLevel,
+        is_at_risk: result.isAtRisk,
+        wants_counseling: result.answers.wantsNutritionCounseling ?? null,
+        practice_email: practice.email || null,
+      });
+      setScreenings(prev => [result, ...prev]);
+    } else if (screeningSavedRef.current) {
+      // Subsequent calls (e.g. counseling choice update): update local state only
+      setScreenings(prev => [result, ...prev.slice(1)]);
+    }
   };
 
   const handleExitScreening = () => {
     setActivePatient(null);
+    screeningSavedRef.current = false;
   };
 
   // If there's an active patient, show the screening wizard
@@ -80,11 +119,15 @@ export function Dashboard({ onLogout }: DashboardProps) {
     setCurrentView(view);
   };
 
+  const handlePracticeDataChange = async (data: { name: string; email: string }) => {
+    await updatePractice({ name: data.name, email: data.email });
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      <Header 
-        practiceName={practiceData.name}
-        onLogout={onLogout} 
+      <Header
+        practiceName={practice?.name || 'Praxis'}
+        onLogout={signOut}
         showSettings={currentView === 'settings'}
         onSettingsClick={() => handleViewChange(currentView === 'settings' ? 'home' : 'settings')}
         showScreenings={currentView === 'screenings'}
@@ -109,9 +152,9 @@ export function Dashboard({ onLogout }: DashboardProps) {
               Einstellungen
             </h2>
 
-            <SettingsView 
-              practiceData={practiceData}
-              onPracticeDataChange={setPracticeData}
+            <SettingsView
+              practiceData={{ name: practice?.name || '', email: practice?.email || '' }}
+              onPracticeDataChange={handlePracticeDataChange}
             />
           </>
         )}
