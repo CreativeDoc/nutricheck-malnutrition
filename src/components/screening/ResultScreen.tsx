@@ -13,7 +13,8 @@ import {
   Home,
   MessageCircle,
   Mail,
-  Loader2
+  Loader2,
+  RefreshCw
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
@@ -32,6 +33,7 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
     result.answers.wantsNutritionCounseling
   );
   const [emailSent, setEmailSent] = useState(false);
+  const [emailError, setEmailError] = useState(false);
   const { sendScreeningEmail, isLoading: isEmailSending } = useScreeningEmail();
   const autoEmailSentRef = useRef(false);
 
@@ -48,6 +50,7 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
       return;
     }
 
+    setEmailError(false);
     const reportText = generateReportText(result);
     const success = await sendScreeningEmail({
       patient_code: result.patientCode,
@@ -69,9 +72,10 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
         description: `Screening-Ergebnis wurde per Email an ${practiceEmail} gesendet`,
       });
     } else {
+      setEmailError(true);
       toast({
         title: 'Fehler beim Email-Versand',
-        description: 'Email konnte nicht gesendet werden. Bitte kopieren Sie den Bericht manuell.',
+        description: 'Keine Verbindung oder Serverfehler. Bitte erneut versuchen.',
         variant: 'destructive',
       });
     }
@@ -218,11 +222,11 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
         </div>
 
         {/* Send Email Button */}
-        <div className="mb-8 animate-scale-in">
+        <div className="mb-8 animate-scale-in space-y-3">
           <Button
             onClick={doSendEmail}
             disabled={isEmailSending || emailSent}
-            variant="outline"
+            variant={emailError ? "destructive" : "outline"}
             className="btn-xl w-full gap-3"
           >
             {isEmailSending ? (
@@ -234,6 +238,11 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
               <>
                 <Check className="w-6 h-6" />
                 Email gesendet
+              </>
+            ) : emailError ? (
+              <>
+                <RefreshCw className="w-6 h-6" />
+                Erneut versuchen
               </>
             ) : (
               <>

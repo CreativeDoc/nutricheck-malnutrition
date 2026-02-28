@@ -13,6 +13,7 @@ import { UserPlus, Activity, ArrowLeft, ClipboardList } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
+import { toast } from '@/hooks/use-toast';
 
 type DashboardView = 'home' | 'settings' | 'screenings';
 
@@ -78,7 +79,7 @@ export function Dashboard() {
     if (practice && user && !screeningSavedRef.current) {
       // First call: insert into DB
       screeningSavedRef.current = true;
-      await supabase.from('screenings').insert({
+      const { error } = await supabase.from('screenings').insert({
         practice_id: practice.id,
         created_by: user.id,
         patient_code: result.patientCode,
@@ -92,7 +93,16 @@ export function Dashboard() {
         wants_counseling: result.answers.wantsNutritionCounseling ?? null,
         practice_email: practice.email || null,
       });
-      setScreenings(prev => [result, ...prev]);
+      if (error) {
+        screeningSavedRef.current = false;
+        toast({
+          title: 'Fehler beim Speichern',
+          description: 'Screening konnte nicht gespeichert werden. Bitte prüfen Sie Ihre Internetverbindung.',
+          variant: 'destructive',
+        });
+      } else {
+        setScreenings(prev => [result, ...prev]);
+      }
     } else if (screeningSavedRef.current) {
       // Subsequent calls (e.g. counseling choice update): update local state only
       setScreenings(prev => [result, ...prev.slice(1)]);
@@ -240,6 +250,15 @@ export function Dashboard() {
         onSubmit={handlePatientSubmit}
         selectedLanguage={selectedLanguage}
       />
+
+      {/* Footer */}
+      <footer className="py-6 text-center text-sm text-muted-foreground">
+        <div className="flex items-center justify-center gap-4">
+          <a href="/impressum" className="hover:text-foreground underline">Impressum</a>
+          <span>·</span>
+          <a href="/datenschutz" className="hover:text-foreground underline">Datenschutz</a>
+        </div>
+      </footer>
     </div>
   );
 }

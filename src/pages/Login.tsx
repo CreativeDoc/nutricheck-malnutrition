@@ -246,6 +246,11 @@ export function Login() {
       <footer className="py-6 text-center text-sm text-muted-foreground">
         <p>NutriCheck Malnutrition Screening v1.0</p>
         <p className="mt-1">Basierend auf NRS 2002</p>
+        <div className="mt-3 flex items-center justify-center gap-4">
+          <a href="/impressum" className="hover:text-foreground underline">Impressum</a>
+          <span>·</span>
+          <a href="/datenschutz" className="hover:text-foreground underline">Datenschutz</a>
+        </div>
       </footer>
     </div>
   );

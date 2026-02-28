@@ -68,6 +68,7 @@ export function AdminDashboard() {
   const [loadingPractices, setLoadingPractices] = useState(true);
   const [loadingScreenings, setLoadingScreenings] = useState(false);
   const [resendingId, setResendingId] = useState<string | null>(null);
+  const [deletingScreeningId, setDeletingScreeningId] = useState<string | null>(null);
   const { sendScreeningEmail } = useScreeningEmail();
 
   // Redirect non-admins
@@ -164,6 +165,18 @@ export function AdminDashboard() {
     setSelectedPractice(p);
     setView('screenings');
     loadScreenings(p.id);
+  };
+
+  const deleteScreening = async (s: ScreeningRow) => {
+    setDeletingScreeningId(s.id);
+    const { error } = await supabase.from('screenings').delete().eq('id', s.id);
+    if (error) {
+      toast({ title: 'Fehler', description: error.message, variant: 'destructive' });
+    } else {
+      setScreenings(prev => prev.filter(sc => sc.id !== s.id));
+      toast({ title: 'Screening gelöscht' });
+    }
+    setDeletingScreeningId(null);
   };
 
   const handleResendEmail = async (s: ScreeningRow) => {
@@ -422,20 +435,52 @@ export function AdminDashboard() {
                           {s.wants_counseling === true ? 'Ja' : s.wants_counseling === false ? 'Nein' : '–'}
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={resendingId === s.id}
-                            onClick={() => handleResendEmail(s)}
-                            className="gap-1"
-                          >
-                            {resendingId === s.id ? (
-                              <Loader2 className="w-3 h-3 animate-spin" />
-                            ) : (
-                              <Mail className="w-3 h-3" />
-                            )}
-                            per Email senden
-                          </Button>
+                          <div className="flex items-center justify-end gap-1">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              disabled={resendingId === s.id}
+                              onClick={() => handleResendEmail(s)}
+                              className="gap-1"
+                            >
+                              {resendingId === s.id ? (
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                              ) : (
+                                <Mail className="w-3 h-3" />
+                              )}
+                              per Email senden
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  disabled={deletingScreeningId === s.id}
+                                  className="h-8 w-8"
+                                >
+                                  {deletingScreeningId === s.id ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                  ) : (
+                                    <Trash2 className="w-4 h-4 text-destructive" />
+                                  )}
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Screening löschen?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Screening für Patient „{s.patient_code}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => deleteScreening(s)}>
+                                    Löschen
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
