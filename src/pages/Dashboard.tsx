@@ -121,8 +121,8 @@ export function Dashboard() {
     setCurrentView(view);
   };
 
-  const handlePracticeDataChange = async (data: { name: string; email: string }) => {
-    await updatePractice({ name: data.name, email: data.email });
+  const handleSettingsSave = async (data: { name: string; email: string; app_language: string }) => {
+    await updatePractice({ name: data.name, email: data.email, app_language: data.app_language });
   };
 
   return (
@@ -158,7 +158,9 @@ export function Dashboard() {
 
             <SettingsView
               practiceData={{ name: practice?.name || '', email: practice?.email || '' }}
-              onPracticeDataChange={handlePracticeDataChange}
+              loginEmail={user?.email || ''}
+              appLanguage={practice?.app_language || 'de'}
+              onSave={handleSettingsSave}
             />
           </>
         )}

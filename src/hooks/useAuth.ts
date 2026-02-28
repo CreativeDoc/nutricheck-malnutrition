@@ -6,6 +6,7 @@ export interface Practice {
   id: string;
   name: string;
   email: string | null;
+  app_language: string;
 }
 
 export function useAuth() {
@@ -27,7 +28,7 @@ export function useAuth() {
 
       const { data: practiceData } = await supabase
         .from('practices')
-        .select('id, name, email')
+        .select('id, name, email, app_language')
         .eq('id', profile.practice_id)
         .single();
 
@@ -90,7 +91,7 @@ export function useAuth() {
     return { error };
   };
 
-  const updatePractice = async (updates: Partial<Pick<Practice, 'name' | 'email'>>) => {
+  const updatePractice = async (updates: Partial<Pick<Practice, 'name' | 'email' | 'app_language'>>) => {
     if (!practice) return { error: new Error('No practice loaded') };
     const { error } = await supabase
       .from('practices')
