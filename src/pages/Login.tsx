@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Activity, LogIn, Eye, EyeOff, UserPlus, Mail, Loader2 } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { Link } from 'react-router-dom';
 
 type AuthMode = 'login' | 'register' | 'reset';
 
@@ -247,9 +248,9 @@ export function Login() {
         <p>NutriCheck Malnutrition Screening v1.0</p>
         <p className="mt-1">Basierend auf NRS 2002</p>
         <div className="mt-3 flex items-center justify-center gap-4">
-          <a href="/impressum" className="hover:text-foreground underline">Impressum</a>
+          <Link to="/impressum" className="hover:text-foreground underline">Impressum</Link>
           <span>·</span>
-          <a href="/datenschutz" className="hover:text-foreground underline">Datenschutz</a>
+          <Link to="/datenschutz" className="hover:text-foreground underline">Datenschutz</Link>
         </div>
       </footer>
     </div>

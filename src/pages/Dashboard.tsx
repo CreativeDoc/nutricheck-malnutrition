@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Patient, PatientLanguage, ScreeningResult } from '@/types/screening';
 import { UserPlus, Activity, ArrowLeft, ClipboardList } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { toast } from '@/hooks/use-toast';
 
@@ -254,9 +254,9 @@ export function Dashboard() {
       {/* Footer */}
       <footer className="py-6 text-center text-sm text-muted-foreground">
         <div className="flex items-center justify-center gap-4">
-          <a href="/impressum" className="hover:text-foreground underline">Impressum</a>
+          <Link to="/impressum" className="hover:text-foreground underline">Impressum</Link>
           <span>·</span>
-          <a href="/datenschutz" className="hover:text-foreground underline">Datenschutz</a>
+          <Link to="/datenschutz" className="hover:text-foreground underline">Datenschutz</Link>
         </div>
       </footer>
     </div>
