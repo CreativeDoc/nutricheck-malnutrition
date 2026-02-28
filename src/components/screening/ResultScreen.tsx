@@ -61,7 +61,6 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
       report_text: reportText,
       wants_counseling: counselingChoice === true,
       practice_email: practiceEmail,
-      cc_email: 'markus.blanke@2docs.eu',
       scores: result.scores,
       recommendations: result.recommendations,
       answers: result.answers as unknown as Record<string, unknown>,
@@ -187,53 +186,51 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
         </div>
 
         {/* Counseling Question */}
-        {result.isAtRisk && (
-          <div className="space-y-4 mb-8 animate-scale-in">
-            <div className="bg-card border-2 border-border rounded-2xl p-6">
-              <div className="flex items-start gap-4 mb-6">
-                <div className="bg-primary/10 p-3 rounded-full">
-                  <MessageCircle className="w-8 h-8 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <h2 className="text-senior-lg font-semibold text-foreground mb-2">
-                    {t.counselingQuestion}
-                  </h2>
-                </div>
+        <div className="space-y-4 mb-8 animate-scale-in">
+          <div className="bg-card border-2 border-border rounded-2xl p-6">
+            <div className="flex items-start gap-4 mb-6">
+              <div className="bg-primary/10 p-3 rounded-full">
+                <MessageCircle className="w-8 h-8 text-primary" />
               </div>
-
-              <div className="flex gap-4">
-                <Button
-                  onClick={() => handleCounselingChoice(true)}
-                  variant={counselingChoice === true ? "default" : "outline"}
-                  className={cn(
-                    "btn-xl flex-1",
-                    counselingChoice === true && "bg-primary hover:bg-primary/90"
-                  )}
-                >
-                  {t.yes}
-                </Button>
-                <Button
-                  onClick={() => handleCounselingChoice(false)}
-                  variant={counselingChoice === false ? "default" : "outline"}
-                  className={cn(
-                    "btn-xl flex-1",
-                    counselingChoice === false && "bg-muted-foreground hover:bg-muted-foreground/90"
-                  )}
-                >
-                  {t.no}
-                </Button>
+              <div className="flex-1">
+                <h2 className="text-senior-lg font-semibold text-foreground mb-2">
+                  {result.isAtRisk ? t.counselingQuestion : t.counselingQuestionNoRisk}
+                </h2>
               </div>
-
-              {counselingChoice === true && (
-                <div className="mt-6 p-4 bg-primary/10 rounded-xl border border-primary/20 animate-scale-in">
-                  <p className="text-senior text-foreground">
-                    <strong>{t.counselingThankYou.split('!')[0]}!</strong> {t.counselingThankYou.split('!')[1]}
-                  </p>
-                </div>
-              )}
             </div>
+
+            <div className="flex gap-4">
+              <Button
+                onClick={() => handleCounselingChoice(true)}
+                variant={counselingChoice === true ? "default" : "outline"}
+                className={cn(
+                  "btn-xl flex-1",
+                  counselingChoice === true && "bg-primary hover:bg-primary/90"
+                )}
+              >
+                {t.yes}
+              </Button>
+              <Button
+                onClick={() => handleCounselingChoice(false)}
+                variant={counselingChoice === false ? "default" : "outline"}
+                className={cn(
+                  "btn-xl flex-1",
+                  counselingChoice === false && "bg-muted-foreground hover:bg-muted-foreground/90"
+                )}
+              >
+                {t.no}
+              </Button>
+            </div>
+
+            {counselingChoice === true && (
+              <div className="mt-6 p-4 bg-primary/10 rounded-xl border border-primary/20 animate-scale-in">
+                <p className="text-senior text-foreground">
+                  <strong>{t.counselingThankYou.split('!')[0]}!</strong> {t.counselingThankYou.split('!')[1]}
+                </p>
+              </div>
+            )}
           </div>
-        )}
+        </div>
 
         {/* Copy Report Button */}
         {result.isAtRisk && (

@@ -11,12 +11,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Patient, PatientLanguage, ScreeningResult } from '@/types/screening';
 import { UserPlus, Activity, ArrowLeft, ClipboardList } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 
 type DashboardView = 'home' | 'settings' | 'screenings';
 
 export function Dashboard() {
-  const { signOut, user, practice, updatePractice } = useAuthContext();
+  const { signOut, user, practice, role, updatePractice } = useAuthContext();
+  const navigate = useNavigate();
   const [showLanguageSelector, setShowLanguageSelector] = useState(false);
   const [showIntro, setShowIntro] = useState(false);
   const [showPatientForm, setShowPatientForm] = useState(false);
@@ -132,6 +134,8 @@ export function Dashboard() {
         onSettingsClick={() => handleViewChange(currentView === 'settings' ? 'home' : 'settings')}
         showScreenings={currentView === 'screenings'}
         onScreeningsClick={() => handleViewChange(currentView === 'screenings' ? 'home' : 'screenings')}
+        isAdmin={role === 'admin'}
+        onAdminClick={() => navigate('/admin')}
       />
 
       <main className="max-w-4xl mx-auto px-6 py-8">

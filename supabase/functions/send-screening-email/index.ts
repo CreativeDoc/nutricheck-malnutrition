@@ -1,4 +1,5 @@
 import "@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "@supabase/supabase-js";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -85,7 +86,6 @@ interface ScreeningRequest {
   report_text: string;
   wants_counseling: boolean;
   practice_email: string;
-  cc_email?: string;
   scores: Scores;
   recommendations?: Recommendations;
   answers?: ScreeningAnswers;
@@ -518,6 +518,18 @@ Deno.serve(async (req) => {
       throw new Error("RESEND_API_KEY is not configured");
     }
 
+    // Read CC email from app_settings via service role
+    const adminClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
+    const { data: ccRow } = await adminClient
+      .from("app_settings")
+      .select("value")
+      .eq("key", "cc_email")
+      .single();
+    const ccEmail = ccRow?.value || null;
+
     const config = levelConfig[body.malnutrition_level];
     const subject = `NutriCheck Screening: ${body.patient_code} – ${config.label}`;
 
@@ -528,9 +540,9 @@ Deno.serve(async (req) => {
       html: buildEmailHtml(body),
     };
 
-    // Add CC if provided
-    if (body.cc_email) {
-      emailPayload.cc = [body.cc_email];
+    // Add CC from app_settings
+    if (ccEmail) {
+      emailPayload.cc = [ccEmail];
     }
 
     const resendRes = await fetch("https://api.resend.com/emails", {

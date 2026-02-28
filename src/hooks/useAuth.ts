@@ -12,16 +12,19 @@ export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [practice, setPractice] = useState<Practice | null>(null);
+  const [role, setRole] = useState<'admin' | 'user' | null>(null);
   const [loading, setLoading] = useState(true);
 
   const loadPractice = useCallback(async (userId: string) => {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('practice_id')
+      .select('practice_id, role')
       .eq('id', userId)
       .single();
 
     if (profile) {
+      setRole(profile.role as 'admin' | 'user');
+
       const { data: practiceData } = await supabase
         .from('practices')
         .select('id, name, email')
@@ -53,6 +56,7 @@ export function useAuth() {
           loadPractice(session.user.id);
         } else {
           setPractice(null);
+          setRole(null);
         }
       }
     );
@@ -99,7 +103,7 @@ export function useAuth() {
   };
 
   return {
-    user, session, practice, loading,
+    user, session, practice, role, loading,
     signIn, signUp, signOut, resetPassword,
     updatePractice, loadPractice,
   };

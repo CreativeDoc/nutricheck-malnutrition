@@ -181,6 +181,7 @@ export interface Translations {
   
   // Counseling
   counselingQuestion: string;
+  counselingQuestionNoRisk: string;
   counselingThankYou: string;
   
   // Therapy
@@ -382,6 +383,7 @@ export const translations: Record<PatientLanguage, Translations> = {
     
     // Counseling
     counselingQuestion: 'Möchten Sie eine Beratung hinsichtlich einer für Sie geeigneten Ernährungstherapie?',
+    counselingQuestionNoRisk: 'Es wurde kein akutes Ernährungsrisiko festgestellt. Möchten Sie dennoch eine Ernährungsberatung in Anspruch nehmen?',
     counselingThankYou: 'Vielen Dank! Ein spezialisierter Ernährungsmediziner wird sich mit der Praxis in Verbindung setzen, um die weiteren Schritte abzusprechen.',
     
     // Therapy
@@ -582,6 +584,7 @@ export const translations: Record<PatientLanguage, Translations> = {
     
     // Counseling
     counselingQuestion: 'Would you like counseling regarding nutrition therapy suitable for you?',
+    counselingQuestionNoRisk: 'No acute nutritional risk was identified. Would you still like to take advantage of nutritional counseling?',
     counselingThankYou: 'Thank you! A specialized nutritional medicine specialist will contact the practice to discuss the next steps with you.',
     
     // Therapy
@@ -782,6 +785,7 @@ export const translations: Record<PatientLanguage, Translations> = {
     
     // Counseling
     counselingQuestion: 'Хотите ли вы получить консультацию по подходящей вам нутритивной терапии?',
+    counselingQuestionNoRisk: 'Острого риска нарушения питания не выявлено. Хотите ли вы всё же воспользоваться консультацией по питанию?',
     counselingThankYou: 'Спасибо! Специализированный врач-диетолог свяжется с клиникой, чтобы обсудить с вами дальнейшие шаги.',
     
     // Therapy
