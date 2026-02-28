@@ -1,18 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { ScreeningResult } from '@/types/screening';
 import { generateReportText } from '@/lib/nrsCalculator';
 import { useTranslation } from '@/hooks/useTranslation';
-import { 
-  CheckCircle2, 
-  AlertTriangle, 
+import { useScreeningEmail } from '@/hooks/useScreeningEmail';
+import {
+  CheckCircle2,
+  AlertTriangle,
   AlertOctagon,
-  Copy, 
+  Copy,
   Check,
   Home,
   Utensils,
   Flame,
-  MessageCircle
+  MessageCircle,
+  Mail,
+  Loader2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
@@ -30,6 +33,50 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
   const [counselingChoice, setCounselingChoice] = useState<boolean | null>(
     result.answers.wantsNutritionCounseling
   );
+  const [emailSent, setEmailSent] = useState(false);
+  const { sendScreeningEmail, isLoading: isEmailSending } = useScreeningEmail();
+  const autoEmailSentRef = useRef(false);
+
+  const getPracticeEmail = () => localStorage.getItem('nutricheck_practice_email') || '';
+
+  const doSendEmail = async () => {
+    const practiceEmail = getPracticeEmail();
+    if (!practiceEmail) {
+      toast({
+        title: 'Keine Praxis-Email hinterlegt',
+        description: 'Hinweis: Keine Praxis-Email hinterlegt. Gehen Sie in die Einstellungen.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const reportText = generateReportText(result);
+    const success = await sendScreeningEmail({
+      patient_code: result.patientCode,
+      patient_birth_date: result.answers.birthDate,
+      total_score: result.totalScore,
+      malnutrition_level: result.malnutritionLevel,
+      report_text: reportText,
+      wants_counseling: counselingChoice === true,
+      practice_email: practiceEmail,
+      scores: result.scores,
+      recommendations: result.recommendations,
+    });
+
+    if (success) {
+      setEmailSent(true);
+      toast({
+        title: 'Email gesendet',
+        description: `Screening-Ergebnis wurde per Email an ${practiceEmail} gesendet`,
+      });
+    } else {
+      toast({
+        title: 'Fehler beim Email-Versand',
+        description: 'Email konnte nicht gesendet werden. Bitte kopieren Sie den Bericht manuell.',
+        variant: 'destructive',
+      });
+    }
+  };
 
   const copyReport = async () => {
     const reportText = generateReportText(result);
@@ -46,6 +93,14 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
     setCounselingChoice(choice);
     onUpdateCounselingChoice?.(choice);
   };
+
+  // Auto-send email when patient wants counseling
+  useEffect(() => {
+    if (counselingChoice === true && !autoEmailSentRef.current && !emailSent) {
+      autoEmailSentRef.current = true;
+      doSendEmail();
+    }
+  }, [counselingChoice]);
 
   const getLevelStyles = () => {
     switch (result.malnutritionLevel) {
@@ -198,6 +253,33 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
             </Button>
           </div>
         )}
+
+        {/* Send Email Button */}
+        <div className="mb-8 animate-scale-in">
+          <Button
+            onClick={doSendEmail}
+            disabled={isEmailSending || emailSent}
+            variant="outline"
+            className="btn-xl w-full gap-3"
+          >
+            {isEmailSending ? (
+              <>
+                <Loader2 className="w-6 h-6 animate-spin" />
+                Wird gesendet...
+              </>
+            ) : emailSent ? (
+              <>
+                <Check className="w-6 h-6" />
+                Email gesendet
+              </>
+            ) : (
+              <>
+                <Mail className="w-6 h-6" />
+                Ergebnis per Email senden
+              </>
+            )}
+          </Button>
+        </div>
 
         {/* Score Breakdown */}
         <div className="bg-card border border-border rounded-2xl p-6 mb-8">
