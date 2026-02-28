@@ -23,15 +23,15 @@ export function PhysicalConditionQuestions({ answers, onChange }: PhysicalCondit
   ];
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-1.5 md:space-y-2">
       {questions.map((q) => (
-        <div key={q.key} className="flex items-center justify-between p-2 rounded-lg border border-border">
+        <div key={q.key} className="flex items-center justify-between p-1.5 md:p-2 rounded-lg border border-border">
           <p className="text-sm font-medium flex-1 pr-2">{q.label}</p>
-          <div className="flex gap-2">
+          <div className="flex gap-1.5 md:gap-2">
             <button
               onClick={() => onChange(q.key, true)}
               className={cn(
-                "flex items-center justify-center gap-1 px-3 py-2 rounded-lg border-2 transition-all min-w-[60px]",
+                "flex items-center justify-center gap-1 px-2.5 py-1.5 md:px-3 md:py-2 rounded-lg border-2 transition-all min-w-[56px] md:min-w-[60px]",
                 answers[q.key] === true
                   ? "bg-primary/10 border-primary text-primary"
                   : "border-border hover:bg-muted/50"
@@ -43,7 +43,7 @@ export function PhysicalConditionQuestions({ answers, onChange }: PhysicalCondit
             <button
               onClick={() => onChange(q.key, false)}
               className={cn(
-                "flex items-center justify-center gap-1 px-3 py-2 rounded-lg border-2 transition-all min-w-[60px]",
+                "flex items-center justify-center gap-1 px-2.5 py-1.5 md:px-3 md:py-2 rounded-lg border-2 transition-all min-w-[56px] md:min-w-[60px]",
                 answers[q.key] === false
                   ? "bg-primary/10 border-primary text-primary"
                   : "border-border hover:bg-muted/50"

@@ -19,13 +19,13 @@ export function MealsPerDaySelector({ value, onChange }: MealsPerDaySelectorProp
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-2">
+    <div className="grid grid-cols-1 gap-1.5 md:gap-2">
       {mealOptions.map((option) => (
         <button
           key={option.value}
           onClick={() => onChange(option.value)}
           className={cn(
-            "flex items-center gap-3 p-3 transition-all duration-200 rounded-xl border-2",
+            "flex items-center gap-3 p-2.5 md:p-3 transition-all duration-200 rounded-xl border-2",
             value === option.value
               ? "ring-2 ring-primary bg-primary/10 border-primary"
               : "border-border bg-card hover:bg-muted/50"

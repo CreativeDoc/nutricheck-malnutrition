@@ -23,7 +23,7 @@ const mobilityOptions = [
 
 export function MobilitySelector({ value, onChange }: MobilitySelectorProps) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-1.5 md:gap-2">
       {mobilityOptions.map((option) => {
         const isSelected = value === option.value;
         const Icon = option.icon;
@@ -34,7 +34,7 @@ export function MobilitySelector({ value, onChange }: MobilitySelectorProps) {
             type="button"
             onClick={() => onChange(option.value)}
             className={cn(
-              "flex items-center px-4 py-3 rounded-xl border-2 relative transition-all",
+              "flex items-center px-3 py-2.5 md:px-4 md:py-3 rounded-xl border-2 relative transition-all",
               isSelected 
                 ? "ring-2 ring-primary border-primary bg-primary/10" 
                 : "border-border bg-card hover:bg-muted/50"

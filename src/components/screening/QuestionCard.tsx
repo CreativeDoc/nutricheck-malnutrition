@@ -26,9 +26,9 @@ export function QuestionCard({
       onClick={onClick}
       className={cn(
         "w-full relative rounded-xl border-2 transition-all duration-200 flex items-center justify-center",
-        size === 'default' && "min-h-[60px] p-3",
-        size === 'medium' && "min-h-[52px] p-2.5",
-        size === 'compact' && "min-h-[44px] p-2",
+        size === 'default' && "min-h-[52px] md:min-h-[60px] p-2.5 md:p-3",
+        size === 'medium' && "min-h-[46px] md:min-h-[52px] p-2 md:p-2.5",
+        size === 'compact' && "min-h-[40px] md:min-h-[44px] p-1.5 md:p-2",
         selected 
           ? "ring-2 ring-primary border-primary bg-primary/10" 
           : "border-border bg-card hover:bg-muted/50",

@@ -27,16 +27,16 @@ export function AcuteDiseaseSelector({ value, onChange }: AcuteDiseaseSelectorPr
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-1.5 md:space-y-2">
       {acuteQuestions.map((q) => (
         <div key={q.key}>
-          <div className="flex items-center justify-between p-2 rounded-lg border border-border">
+          <div className="flex items-center justify-between p-1.5 md:p-2 rounded-lg border border-border">
             <p className="text-sm font-medium flex-1 pr-2">{q.label}</p>
-            <div className="flex gap-2">
+            <div className="flex gap-1.5 md:gap-2">
               <button
                 onClick={() => updateDisease(q.key, true)}
                 className={cn(
-                  "flex items-center justify-center gap-1 px-3 py-2 rounded-lg border-2 transition-all min-w-[60px]",
+                  "flex items-center justify-center gap-1 px-2.5 py-1.5 md:px-3 md:py-2 rounded-lg border-2 transition-all min-w-[56px] md:min-w-[60px]",
                   value[q.key] === true
                     ? "bg-primary/10 border-primary text-primary"
                     : "border-border hover:bg-muted/50"
@@ -48,7 +48,7 @@ export function AcuteDiseaseSelector({ value, onChange }: AcuteDiseaseSelectorPr
               <button
                 onClick={() => updateDisease(q.key, false)}
                 className={cn(
-                  "flex items-center justify-center gap-1 px-3 py-2 rounded-lg border-2 transition-all min-w-[60px]",
+                  "flex items-center justify-center gap-1 px-2.5 py-1.5 md:px-3 md:py-2 rounded-lg border-2 transition-all min-w-[56px] md:min-w-[60px]",
                   value[q.key] === false
                     ? "bg-primary/10 border-primary text-primary"
                     : "border-border hover:bg-muted/50"
@@ -60,11 +60,11 @@ export function AcuteDiseaseSelector({ value, onChange }: AcuteDiseaseSelectorPr
             </div>
           </div>
           {q.hasDetails && value[q.key] === true && (
-            <Input 
-              placeholder={q.placeholder} 
-              value={(value[q.detailsKey!] as string) || ''} 
-              onChange={(e) => updateDisease(q.detailsKey!, e.target.value)} 
-              className="text-sm h-10 mt-1" 
+            <Input
+              placeholder={q.placeholder}
+              value={(value[q.detailsKey!] as string) || ''}
+              onChange={(e) => updateDisease(q.detailsKey!, e.target.value)}
+              className="text-sm h-9 md:h-10 mt-1"
             />
           )}
         </div>
@@ -92,16 +92,16 @@ export function ChronicDiseaseSelector({ value, onChange }: ChronicDiseaseSelect
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-1 md:space-y-2">
       {chronicQuestions.map((q) => (
         <div key={q.key}>
-          <div className="flex items-center justify-between p-2 rounded-lg border border-border">
+          <div className="flex items-center justify-between p-1.5 md:p-2 rounded-lg border border-border">
             <p className="text-sm font-medium flex-1 pr-2">{q.label}</p>
-            <div className="flex gap-2">
+            <div className="flex gap-1.5 md:gap-2">
               <button
                 onClick={() => updateDisease(q.key, true)}
                 className={cn(
-                  "flex items-center justify-center gap-1 px-3 py-2 rounded-lg border-2 transition-all min-w-[60px]",
+                  "flex items-center justify-center gap-1 px-2.5 py-1.5 md:px-3 md:py-2 rounded-lg border-2 transition-all min-w-[56px] md:min-w-[60px]",
                   value[q.key] === true
                     ? "bg-primary/10 border-primary text-primary"
                     : "border-border hover:bg-muted/50"
@@ -113,7 +113,7 @@ export function ChronicDiseaseSelector({ value, onChange }: ChronicDiseaseSelect
               <button
                 onClick={() => updateDisease(q.key, false)}
                 className={cn(
-                  "flex items-center justify-center gap-1 px-3 py-2 rounded-lg border-2 transition-all min-w-[60px]",
+                  "flex items-center justify-center gap-1 px-2.5 py-1.5 md:px-3 md:py-2 rounded-lg border-2 transition-all min-w-[56px] md:min-w-[60px]",
                   value[q.key] === false
                     ? "bg-primary/10 border-primary text-primary"
                     : "border-border hover:bg-muted/50"
@@ -128,13 +128,13 @@ export function ChronicDiseaseSelector({ value, onChange }: ChronicDiseaseSelect
       ))}
 
       {/* Other Diseases */}
-      <div className="p-2 rounded-lg border border-border">
-        <span className="text-sm font-medium block mb-2">{t.otherDiseases}</span>
-        <Input 
-          placeholder={t.otherDiseasesPlaceholder} 
-          value={value.otherDiseases || ''} 
-          onChange={(e) => updateDisease('otherDiseases', e.target.value)} 
-          className="text-sm h-10" 
+      <div className="p-1.5 md:p-2 rounded-lg border border-border">
+        <span className="text-sm font-medium block mb-1 md:mb-2">{t.otherDiseases}</span>
+        <Input
+          placeholder={t.otherDiseasesPlaceholder}
+          value={value.otherDiseases || ''}
+          onChange={(e) => updateDisease('otherDiseases', e.target.value)}
+          className="text-sm h-9 md:h-10"
         />
       </div>
     </div>

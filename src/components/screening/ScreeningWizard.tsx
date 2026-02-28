@@ -79,13 +79,8 @@ function ScreeningWizardContent({
     onComplete(calculatedResult);
   };
 
-  // Check if all physical condition questions are answered
-  const physicalConditionComplete = 
-    answers.feelsWeaker !== null &&
-    answers.muscleLoss !== null &&
-    answers.frequentInfections !== null &&
-    answers.difficultyGettingUp !== null &&
-    answers.shortnessOfBreath !== null;
+  // Physical condition questions are optional (like diseases)
+  const physicalConditionComplete = true;
 
   const handleCounselingChoiceUpdate = (wantsCounseling: boolean) => {
     setAnswers(prev => ({ ...prev, wantsNutritionCounseling: wantsCounseling }));
@@ -568,7 +563,7 @@ function ScreeningWizardContent({
           title={t.swallowingQuestion}
           subtitle={t.swallowingSubtitle}
           canGoBack={true}
-          canGoNext={answers.hasSwallowingIssues !== null}
+          canGoNext={true}
           onBack={() => goBack('drinkingAmount')}
           onNext={() => goNext('medication')}
         >
@@ -606,7 +601,7 @@ function ScreeningWizardContent({
           totalSteps={totalSteps}
           title={t.medicationQuestion}
           canGoBack={true}
-          canGoNext={answers.takesMedication !== null}
+          canGoNext={true}
           onBack={() => goBack('swallowing')}
           onNext={() => goNext('supplements')}
         >
@@ -644,7 +639,7 @@ function ScreeningWizardContent({
           totalSteps={totalSteps}
           title={t.supplementsQuestion}
           canGoBack={true}
-          canGoNext={answers.hasSupplementExperience !== null}
+          canGoNext={true}
           onBack={() => goBack('medication')}
           onNext={() => goNext('nutritionTherapy')}
         >
@@ -683,7 +678,7 @@ function ScreeningWizardContent({
           title={t.nutritionTherapyQuestion}
           subtitle={t.nutritionTherapySubtitle}
           canGoBack={true}
-          canGoNext={answers.hadNutritionTherapy !== null}
+          canGoNext={true}
           onBack={() => goBack('supplements')}
           onNext={() => goNext('infusions')}
         >
@@ -721,7 +716,7 @@ function ScreeningWizardContent({
           totalSteps={totalSteps}
           title={t.infusionsQuestion}
           canGoBack={true}
-          canGoNext={answers.hadNutrientInfusions !== null}
+          canGoNext={true}
           isLastStep={true}
           onBack={() => goBack('nutritionTherapy')}
           onNext={finishScreening}

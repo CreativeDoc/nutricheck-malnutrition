@@ -18,7 +18,7 @@ export function PortionSelector({ value, onChange }: PortionSelectorProps) {
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <div className="grid grid-cols-2 gap-2 md:gap-3">
       {portions.map((portion) => {
         const isSelected = value === portion.value;
         const fillPercentage = portion.value;
@@ -29,7 +29,7 @@ export function PortionSelector({ value, onChange }: PortionSelectorProps) {
             type="button"
             onClick={() => onChange(portion.value)}
             className={cn(
-              "flex flex-col items-center relative p-3 rounded-xl border-2 transition-all",
+              "flex flex-col items-center relative p-2 md:p-3 rounded-xl border-2 transition-all",
               isSelected 
                 ? "ring-2 ring-primary border-primary bg-primary/10" 
                 : "border-border bg-card hover:bg-muted/50"

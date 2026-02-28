@@ -312,8 +312,8 @@ export const translations: Record<PatientLanguage, Translations> = {
     sweetDislike: 'Nicht so gern',
     meatQuestion: 'Wie oft essen Sie Fleisch oder Wurstwaren in der Woche?',
     carbsQuestion: 'Wie oft essen Sie Kohlenhydrate?',
-    carbsSubtitle: 'Kartoffeln, Reis, Nudeln, Hülsenfrüchte',
-    
+    carbsSubtitle: 'z.B. Brot, Brötchen, Nudeln, Reis, Kartoffeln, Müsli',
+
     // Diseases
     acuteDiseasesTitle: 'Aktuelle Erkrankungen',
     chronicDiseasesTitle: 'Chronische Erkrankungen',
@@ -513,8 +513,8 @@ export const translations: Record<PatientLanguage, Translations> = {
     sweetDislike: 'Not so much',
     meatQuestion: 'How often do you eat meat or sausages per week?',
     carbsQuestion: 'How often do you eat carbohydrates?',
-    carbsSubtitle: 'Potatoes, rice, pasta, legumes',
-    
+    carbsSubtitle: 'e.g. bread, rolls, pasta, rice, potatoes, cereal',
+
     // Diseases
     acuteDiseasesTitle: 'Current Illnesses',
     chronicDiseasesTitle: 'Chronic Illnesses',
@@ -714,8 +714,8 @@ export const translations: Record<PatientLanguage, Translations> = {
     sweetDislike: 'Не очень',
     meatQuestion: 'Как часто вы едите мясо или колбасы в неделю?',
     carbsQuestion: 'Как часто вы едите углеводы?',
-    carbsSubtitle: 'Картофель, рис, макароны, бобовые',
-    
+    carbsSubtitle: 'напр. хлеб, булочки, макароны, рис, картофель, мюсли',
+
     // Diseases
     acuteDiseasesTitle: 'Текущие заболевания',
     chronicDiseasesTitle: 'Хронические заболевания',

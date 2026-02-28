@@ -9,11 +9,8 @@ import {
   CheckCircle2,
   AlertTriangle,
   AlertOctagon,
-  Copy,
   Check,
   Home,
-  Utensils,
-  Flame,
   MessageCircle,
   Mail,
   Loader2
@@ -31,7 +28,6 @@ interface ResultScreenProps {
 export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpdateCounselingChoice }: ResultScreenProps) {
   const { t } = useTranslation();
   const { practice } = useAuthContext();
-  const [copied, setCopied] = useState(false);
   const [counselingChoice, setCounselingChoice] = useState<boolean | null>(
     result.answers.wantsNutritionCounseling
   );
@@ -79,17 +75,6 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
         variant: 'destructive',
       });
     }
-  };
-
-  const copyReport = async () => {
-    const reportText = generateReportText(result);
-    await navigator.clipboard.writeText(reportText);
-    setCopied(true);
-    toast({
-      title: t.copied,
-      description: t.copied,
-    });
-    setTimeout(() => setCopied(false), 2000);
   };
 
   const handleCounselingChoice = (choice: boolean) => {
@@ -231,29 +216,6 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
             )}
           </div>
         </div>
-
-        {/* Copy Report Button */}
-        {result.isAtRisk && (
-          <div className="mb-8 animate-scale-in">
-            <Button
-              onClick={copyReport}
-              variant="outline"
-              className="btn-xl w-full gap-3"
-            >
-              {copied ? (
-                <>
-                  <Check className="w-6 h-6" />
-                  {t.copied}
-                </>
-              ) : (
-                <>
-                  <Copy className="w-6 h-6" />
-                  {t.copyReport}
-                </>
-              )}
-            </Button>
-          </div>
-        )}
 
         {/* Send Email Button */}
         <div className="mb-8 animate-scale-in">

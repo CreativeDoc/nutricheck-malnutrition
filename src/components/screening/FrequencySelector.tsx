@@ -20,21 +20,21 @@ export function FrequencySelector({ value, onChange, label }: FrequencySelectorP
   ];
 
   return (
-    <div className="space-y-2">
-      <p className="text-base text-muted-foreground text-center mb-3">{label}</p>
-      <div className="grid grid-cols-1 gap-2">
+    <div className="space-y-1.5 md:space-y-2">
+      <p className="text-sm md:text-base text-muted-foreground text-center mb-2 md:mb-3">{label}</p>
+      <div className="grid grid-cols-1 gap-1.5 md:gap-2">
         {frequencyOptions.map((option) => (
           <button
             key={option.value}
             onClick={() => onChange(option.value)}
             className={cn(
-              "p-3 text-center transition-all duration-200 rounded-xl border-2",
+              "p-2.5 md:p-3 text-center transition-all duration-200 rounded-xl border-2",
               value === option.value
                 ? "ring-2 ring-primary bg-primary/10 border-primary"
                 : "border-border bg-card hover:bg-muted/50"
             )}
           >
-            <span className="text-base font-medium">{option.label}</span>
+            <span className="text-sm md:text-base font-medium">{option.label}</span>
           </button>
         ))}
       </div>

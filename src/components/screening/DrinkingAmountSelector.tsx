@@ -18,13 +18,13 @@ export function DrinkingAmountSelector({ value, onChange }: DrinkingAmountSelect
   ];
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-1.5 md:gap-2">
       {drinkingOptions.map((option) => (
         <button
           key={option.value}
           onClick={() => onChange(option.value)}
           className={cn(
-            "flex items-center gap-3 p-3 transition-all duration-200 rounded-xl border-2",
+            "flex items-center gap-3 p-2.5 md:p-3 transition-all duration-200 rounded-xl border-2",
             value === option.value
               ? "ring-2 ring-primary bg-primary/10 border-primary"
               : "border-border bg-card hover:bg-muted/50"
