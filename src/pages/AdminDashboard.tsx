@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { FEATURES } from '@/config/featureFlags';
 import { useScreeningEmail } from '@/hooks/useScreeningEmail';
 import { generateReportText } from '@/lib/nrsCalculator';
 import { supabase } from '@/lib/supabase';
@@ -71,9 +72,9 @@ export function AdminDashboard() {
   const [deletingScreeningId, setDeletingScreeningId] = useState<string | null>(null);
   const { sendScreeningEmail } = useScreeningEmail();
 
-  // Redirect non-admins
+  // Redirect when admin dashboard is disabled or user is not admin
   useEffect(() => {
-    if (role !== null && role !== 'admin') {
+    if (!FEATURES.ADMIN_DASHBOARD || (role !== null && role !== 'admin')) {
       navigate('/');
     }
   }, [role, navigate]);

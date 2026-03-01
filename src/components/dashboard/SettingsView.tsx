@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Globe, Building2, Save, Mail } from 'lucide-react';
+import { FEATURES } from '@/config/featureFlags';
 
 interface SettingsViewProps {
   practiceData: { name: string; email: string };
@@ -53,30 +54,34 @@ export function SettingsView({ practiceData, loginEmail, appLanguage, onSave }: 
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Login Email (read-only) */}
-          <div className="space-y-2">
-            <Label className="text-senior font-medium flex items-center gap-2">
-              <Mail className="w-4 h-4 text-muted-foreground" />
-              Anmelde-Email
-            </Label>
-            <p className="text-senior text-muted-foreground bg-muted/50 rounded-lg px-4 py-3">
-              {loginEmail}
-            </p>
-          </div>
+          {FEATURES.PRACTICE_SETTINGS_FULL && (
+            <>
+              {/* Login Email (read-only) */}
+              <div className="space-y-2">
+                <Label className="text-senior font-medium flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-muted-foreground" />
+                  Anmelde-Email
+                </Label>
+                <p className="text-senior text-muted-foreground bg-muted/50 rounded-lg px-4 py-3">
+                  {loginEmail}
+                </p>
+              </div>
 
-          {/* Practice Name */}
-          <div className="space-y-2">
-            <Label htmlFor="practiceName" className="text-senior font-medium">
-              Praxisname
-            </Label>
-            <Input
-              id="practiceName"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="h-14 text-senior"
-              placeholder="Name Ihrer Praxis"
-            />
-          </div>
+              {/* Practice Name */}
+              <div className="space-y-2">
+                <Label htmlFor="practiceName" className="text-senior font-medium">
+                  Praxisname
+                </Label>
+                <Input
+                  id="practiceName"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="h-14 text-senior"
+                  placeholder="Name Ihrer Praxis"
+                />
+              </div>
+            </>
+          )}
 
           {/* Notification Email */}
           <div className="space-y-2">

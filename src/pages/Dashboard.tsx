@@ -14,6 +14,7 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { toast } from '@/hooks/use-toast';
+import { FEATURES } from '@/config/featureFlags';
 
 type DashboardView = 'home' | 'settings' | 'screenings';
 
@@ -31,13 +32,14 @@ export function Dashboard() {
 
   const loadScreenings = useCallback(async () => {
     if (!practice) return;
+    // Always load from DB (data stays in sync), but only expose to UI when flag is on
     const { data } = await supabase
       .from('screenings')
       .select('*')
       .eq('practice_id', practice.id)
       .order('created_at', { ascending: false });
 
-    if (data) {
+    if (data && FEATURES.SCREENING_HISTORY) {
       setScreenings(data.map(row => ({
         patientCode: row.patient_code,
         answers: row.answers,
@@ -100,10 +102,10 @@ export function Dashboard() {
           description: 'Screening konnte nicht gespeichert werden. Bitte prüfen Sie Ihre Internetverbindung.',
           variant: 'destructive',
         });
-      } else {
+      } else if (FEATURES.SCREENING_HISTORY) {
         setScreenings(prev => [result, ...prev]);
       }
-    } else if (screeningSavedRef.current) {
+    } else if (screeningSavedRef.current && FEATURES.SCREENING_HISTORY) {
       // Subsequent calls (e.g. counseling choice update): update local state only
       setScreenings(prev => [result, ...prev.slice(1)]);
     }
@@ -142,8 +144,8 @@ export function Dashboard() {
         onLogout={signOut}
         showSettings={currentView === 'settings'}
         onSettingsClick={() => handleViewChange(currentView === 'settings' ? 'home' : 'settings')}
-        showScreenings={currentView === 'screenings'}
-        onScreeningsClick={() => handleViewChange(currentView === 'screenings' ? 'home' : 'screenings')}
+        showScreenings={FEATURES.SCREENING_HISTORY ? currentView === 'screenings' : undefined}
+        onScreeningsClick={FEATURES.SCREENING_HISTORY ? () => handleViewChange(currentView === 'screenings' ? 'home' : 'screenings') : undefined}
         isAdmin={role === 'admin'}
         onAdminClick={() => navigate('/admin')}
       />

@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { LogOut, Activity, Settings, ClipboardList, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { FEATURES } from '@/config/featureFlags';
 
 interface HeaderProps {
   practiceName?: string;
@@ -39,7 +40,7 @@ export function Header({
         </div>
 
         <div className="flex items-center gap-2">
-          {isAdmin && (
+          {FEATURES.ADMIN_DASHBOARD && isAdmin && (
             <Button
               variant="outline"
               onClick={onAdminClick}
@@ -50,14 +51,16 @@ export function Header({
             </Button>
           )}
 
-          <Button
-            variant={showScreenings ? "default" : "outline"}
-            onClick={onScreeningsClick}
-            className={cn("gap-2", showScreenings && "bg-primary text-primary-foreground")}
-          >
-            <ClipboardList className="w-5 h-5" />
-            <span className="hidden sm:inline">Screenings</span>
-          </Button>
+          {FEATURES.SCREENING_HISTORY && (
+            <Button
+              variant={showScreenings ? "default" : "outline"}
+              onClick={onScreeningsClick}
+              className={cn("gap-2", showScreenings && "bg-primary text-primary-foreground")}
+            >
+              <ClipboardList className="w-5 h-5" />
+              <span className="hidden sm:inline">Screenings</span>
+            </Button>
+          )}
 
           <Button
             variant={showSettings ? "default" : "outline"}
