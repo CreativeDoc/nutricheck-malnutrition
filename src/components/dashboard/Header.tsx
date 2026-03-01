@@ -40,7 +40,7 @@ export function Header({
         </div>
 
         <div className="flex items-center gap-2">
-          {FEATURES.ADMIN_DASHBOARD && isAdmin && (
+          {isAdmin && (
             <Button
               variant="outline"
               onClick={onAdminClick}
@@ -62,14 +62,16 @@ export function Header({
             </Button>
           )}
 
-          <Button
-            variant={showSettings ? "default" : "outline"}
-            onClick={onSettingsClick}
-            className={cn("gap-2", showSettings && "bg-primary text-primary-foreground")}
-          >
-            <Settings className="w-5 h-5" />
-            <span className="hidden sm:inline">Einstellungen</span>
-          </Button>
+          {(isAdmin || FEATURES.PRACTICE_SETTINGS) && (
+            <Button
+              variant={showSettings ? "default" : "outline"}
+              onClick={onSettingsClick}
+              className={cn("gap-2", showSettings && "bg-primary text-primary-foreground")}
+            >
+              <Settings className="w-5 h-5" />
+              <span className="hidden sm:inline">Einstellungen</span>
+            </Button>
+          )}
 
           <Button
             variant="outline"

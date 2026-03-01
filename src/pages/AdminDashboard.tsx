@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '@/contexts/AuthContext';
-import { FEATURES } from '@/config/featureFlags';
 import { useScreeningEmail } from '@/hooks/useScreeningEmail';
 import { generateReportText } from '@/lib/nrsCalculator';
 import { supabase } from '@/lib/supabase';
@@ -74,7 +73,7 @@ export function AdminDashboard() {
 
   // Redirect when admin dashboard is disabled or user is not admin
   useEffect(() => {
-    if (!FEATURES.ADMIN_DASHBOARD || (role !== null && role !== 'admin')) {
+    if (role !== null && role !== 'admin') {
       navigate('/');
     }
   }, [role, navigate]);
