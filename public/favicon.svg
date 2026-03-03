@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="ag" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#c6e84e"/>
+      <stop offset="35%" stop-color="#8bc34a"/>
+      <stop offset="100%" stop-color="#558b2f"/>
+    </radialGradient>
+    <radialGradient id="hi" cx="30%" cy="30%" r="30%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.35)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </radialGradient>
+  </defs>
+  <!-- Apple body -->
+  <path d="M256 472 C148 472 72 376 72 268 C72 196 100 148 144 128 C168 116 196 124 224 136 C240 142 248 146 256 146 C264 146 272 142 288 136 C316 124 344 116 368 128 C412 148 440 196 440 268 C440 376 364 472 256 472Z" fill="url(#ag)"/>
+  <!-- Highlight -->
+  <ellipse cx="200" cy="240" rx="80" ry="100" fill="url(#hi)"/>
+  <!-- Stem -->
+  <path d="M256 146 C258 118 266 86 260 48" stroke="#5D4037" stroke-width="16" stroke-linecap="round" fill="none"/>
+  <!-- Leaf -->
+  <path d="M264 78 C290 52 326 42 352 50 C346 68 316 84 284 90Z" fill="#66BB6A"/>
+  <path d="M264 78 C290 52 326 42 352 50" stroke="#4CAF50" stroke-width="2" fill="none" opacity="0.6"/>
+</svg>
