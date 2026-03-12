@@ -11,6 +11,7 @@ export interface ScreeningEmailParams {
   report_text: string;
   wants_counseling: boolean;
   practice_email: string;
+  practice_name?: string;
   scores: {
     bmi: number;
     weightLossScore: number;

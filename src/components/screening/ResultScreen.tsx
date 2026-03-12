@@ -60,6 +60,7 @@ export function ResultScreen({ result, onNewScreening, onBackToDashboard, onUpda
       report_text: reportText,
       wants_counseling: counselingChoice === true,
       practice_email: practiceEmail,
+      practice_name: practice?.name || '',
       scores: result.scores,
       recommendations: result.recommendations,
       answers: result.answers as unknown as Record<string, unknown>,

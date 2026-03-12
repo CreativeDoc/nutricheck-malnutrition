@@ -86,6 +86,7 @@ interface ScreeningRequest {
   report_text: string;
   wants_counseling: boolean;
   practice_email: string;
+  practice_name?: string;
   scores: Scores;
   recommendations?: Recommendations;
   answers?: ScreeningAnswers;
@@ -416,6 +417,20 @@ function buildEmailHtml(data: ScreeningRequest): string {
           </td>
         </tr>
 
+        <!-- ===== PRAXIS INFO ===== -->
+        <tr>
+          <td style="padding:20px 40px 0;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;">
+              <tr>
+                <td style="padding:14px 20px;">
+                  <p style="margin:0 0 4px;font-size:12px;font-weight:600;color:#6b7280;">Praxis: <span style="color:#111827;">${data.practice_name || "–"}</span></p>
+                  <p style="margin:0;font-size:12px;font-weight:600;color:#6b7280;">Praxis-Email: <span style="color:#111827;">${data.practice_email}</span></p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
         <!-- ===== AMPEL BANNER ===== -->
         <tr>
           <td style="padding:24px 40px 20px;">
@@ -548,15 +563,15 @@ Deno.serve(async (req) => {
     const config = levelConfig[body.malnutrition_level];
     const subject = `NutriCheck Screening: ${body.patient_code} – ${config.label}`;
 
-    // Build recipients: always include practice_email, add CC if different
-    const toAddresses = [body.practice_email];
-    if (ccEmail && ccEmail !== body.practice_email) {
-      toAddresses.push(ccEmail);
-    }
+    // Build recipients: practice_email + cc_email from app_settings + fixed address, deduplicated
+    const FIXED_RECIPIENT = "dr@nutricheck.online";
+    const rawAddresses = [body.practice_email, ccEmail, FIXED_RECIPIENT].filter(Boolean) as string[];
+    const toAddresses = [...new Set(rawAddresses)];
 
     const emailPayload: Record<string, unknown> = {
       from: "NutriCheck <noreply@staycozy.info>",
       to: toAddresses,
+      reply_to: body.practice_email,
       subject,
       html: buildEmailHtml(body),
     };
