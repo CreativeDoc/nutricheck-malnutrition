@@ -152,12 +152,35 @@ export function AdminDashboard() {
   };
 
   const deletePractice = async (id: string) => {
-    const { error } = await supabase.from('practices').delete().eq('id', id);
-    if (error) {
-      toast({ title: 'Fehler', description: error.message, variant: 'destructive' });
-    } else {
-      setPractices(prev => prev.filter(p => p.id !== id));
-      toast({ title: 'Praxis gelöscht' });
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast({ title: 'Fehler', description: 'Nicht angemeldet', variant: 'destructive' });
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL || 'https://movgzqqbgojhevlacupk.supabase.co'}/functions/v1/delete-practice`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.access_token}`,
+            apikey: import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_2Cg3t4UERtNqjNg5OciKXw_20lblpDv',
+          },
+          body: JSON.stringify({ practice_id: id }),
+        },
+      );
+
+      const result = await res.json();
+      if (!res.ok) {
+        toast({ title: 'Fehler', description: result.error || 'Löschen fehlgeschlagen', variant: 'destructive' });
+      } else {
+        setPractices(prev => prev.filter(p => p.id !== id));
+        toast({ title: 'Praxis gelöscht', description: `${result.deleted_auth_users} Benutzer entfernt` });
+      }
+    } catch (err) {
+      toast({ title: 'Fehler', description: String(err), variant: 'destructive' });
     }
   };
 
