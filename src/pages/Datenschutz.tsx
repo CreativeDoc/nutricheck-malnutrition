@@ -28,10 +28,9 @@ export function Datenschutz() {
             </h2>
             <p className="text-foreground leading-relaxed">
               Dr. med. John Heim<br />
-              [Adresse wird ergänzt]<br />
-              [PLZ Ort]<br />
-              E-Mail: [wird ergänzt]<br />
-              Telefon: [wird ergänzt]
+              Müllerstr. 51<br />
+              13349 Berlin<br />
+              E-Mail: dr@nutricheck.online
             </p>
           </section>
 

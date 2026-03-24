@@ -28,8 +28,8 @@ export function Impressum() {
             </h2>
             <p className="text-foreground leading-relaxed">
               Dr. med. John Heim<br />
-              [Adresse wird ergänzt]<br />
-              [PLZ Ort]
+              Müllerstr. 51<br />
+              13349 Berlin
             </p>
           </section>
 
@@ -38,8 +38,7 @@ export function Impressum() {
               Kontakt
             </h2>
             <p className="text-foreground leading-relaxed">
-              Telefon: [wird ergänzt]<br />
-              E-Mail: [wird ergänzt]
+              E-Mail: dr@nutricheck.online
             </p>
           </section>
 
@@ -57,7 +56,7 @@ export function Impressum() {
               Zuständige Aufsichtsbehörde
             </h2>
             <p className="text-foreground leading-relaxed">
-              [Zuständige Ärztekammer wird ergänzt]
+              Ärztekammer Berlin
             </p>
           </section>
 
